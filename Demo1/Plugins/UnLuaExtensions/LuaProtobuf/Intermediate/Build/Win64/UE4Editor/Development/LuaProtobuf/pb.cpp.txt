@@ -5,7 +5,7 @@ D:\UE\DEMO\Demo1\Plugins\UnLua\Source\ThirdParty\Lua\lua-5.4.3\src\lua.h
 D:\UE\DEMO\Demo1\Plugins\UnLua\Source\ThirdParty\Lua\lua-5.4.3\src\luaconf.h
 D:\UE\DEMO\Demo1\Plugins\UnLua\Source\ThirdParty\Lua\lua-5.4.3\src\lualib.h
 D:\UE\DEMO\Demo1\Plugins\UnLua\Source\ThirdParty\Lua\lua-5.4.3\src\lauxlib.h
-C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\assert.h
-C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\io.h
-C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt_io.h
-C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\fcntl.h
+D:\Windows Kits\10\include\10.0.18362.0\ucrt\assert.h
+D:\Windows Kits\10\include\10.0.18362.0\ucrt\io.h
+D:\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_io.h
+D:\Windows Kits\10\include\10.0.18362.0\ucrt\fcntl.h
