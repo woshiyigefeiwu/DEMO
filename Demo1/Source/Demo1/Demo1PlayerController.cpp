@@ -11,6 +11,8 @@ ADemo1PlayerController::ADemo1PlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+
+	bReplicates = true;
 }
 
 void ADemo1PlayerController::PlayerTick(float DeltaTime)
@@ -109,4 +111,8 @@ void ADemo1PlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
+}
+
+void ADemo1PlayerController::BeginPlay()
+{
 }

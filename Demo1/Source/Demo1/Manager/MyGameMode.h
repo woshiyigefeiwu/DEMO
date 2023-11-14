@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "GeneralConfig.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
 #include "MyGameMode.generated.h"
@@ -16,4 +18,16 @@ class DEMO1_API AMyGameMode : public AGameMode
 	
 public:
 	AMyGameMode();
+
+	UFUNCTION()
+	void BeginPlay() override;
+	
+	UFUNCTION()
+	void CreateGeneralConfig();
+
+	UFUNCTION()
+	AGeneralConfig* GetGeneralConfig();
+
+private:
+	AGeneralConfig* M_GeneralConfig = nullptr;
 };
