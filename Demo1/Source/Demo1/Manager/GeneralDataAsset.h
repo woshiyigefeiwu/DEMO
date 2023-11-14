@@ -79,4 +79,20 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FSoldierInfo> SoldierInfoList;
+
+	// 游戏开始界面
+	UPROPERTY(EditAnywhere)
+	FSoftClassPath WBP_GameStart;
+
+	// 选择阵营界面
+	UPROPERTY(EditAnywhere)
+	FSoftClassPath WBP_SelectCamp;
+
+	// 放置界面
+	UPROPERTY(EditAnywhere)
+	FSoftClassPath WBP_PlaceAI;
+
+	// 游戏进行时界面
+	UPROPERTY(EditAnywhere)
+	FSoftClassPath WBP_GamePlay;
 };

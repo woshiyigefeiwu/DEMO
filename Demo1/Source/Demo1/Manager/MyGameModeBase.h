@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "GeneralConfig.h"
 #include "GeneralDataAsset.h"
 
 #include "CoreMinimal.h"
@@ -24,15 +23,12 @@ public:
 	void BeginPlay() override;
 
 	UFUNCTION()
-	void CreateGeneralConfig();
-
-	UFUNCTION()
-	AGeneralConfig* GetGeneralConfig();
+	UGeneralDataAsset* GetGeneralDataAsset();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataAssets")
 	UGeneralDataAsset* GeneralDataAsset = nullptr;
 
-private:
-	AGeneralConfig* M_GeneralConfig = nullptr;
+//private:
+	//AGeneralConfig* M_GeneralConfig = nullptr;
 };

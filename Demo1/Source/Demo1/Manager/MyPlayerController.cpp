@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Kismet/GameplayStatics.h"
+#include "MyGameModeBase.h"
 #include "MyPlayerController.h"
 #include "Blueprint/UserWidget.h"
 
@@ -24,39 +25,38 @@ void AMyPlayerController::BeginPlay()
 
 void AMyPlayerController::LoadUI()
 {
+	AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(this));
+	UGeneralDataAsset* GDA = nullptr;
+	if (GM)
+	{
+		GDA = GM->GeneralDataAsset;
+	}
+	
 	// 创建 3 个UI
 	
 	// 游戏开始界面
-	FString GameStartUIPath = FString(TEXT("Blueprint'/Game/Demo/BluePrints/UI/WBP_GameStart.WBP_GameStart_C'"));
-	auto GameStartPathUIClass = LoadClass<UUserWidget>(NULL, *GameStartUIPath);
-	if (GameStartPathUIClass != nullptr)
+	if (GDA)
 	{
-		M_WBP_GameStart = CreateWidget<UUserWidget>(GetWorld(), GameStartPathUIClass);
+		M_WBP_GameStart = CreateUI(GDA->WBP_GameStart);
 		M_WBP_Target = M_WBP_GameStart;
 	}
-
-	// 选择阵营界面
-	FString SelectCampUIPath = FString(TEXT("Blueprint'/Game/Demo/BluePrints/UI/WBP_SelectCamp.WBP_SelectCamp_C'"));
-	auto SelectCampUIClass = LoadClass<UUserWidget>(NULL, *SelectCampUIPath);
-	if (SelectCampUIClass != nullptr)
-	{
-		M_WBP_SelectCamp = CreateWidget<UUserWidget>(GetWorld(), SelectCampUIClass);
-	}
 	
-	// 放置界面
-	FString PlaceAIUIPath = FString(TEXT("Blueprint'/Game/Demo/BluePrints/UI/WBP_PlaceAI.WBP_PlaceAI_C'"));
-	auto PlaceAIUIClass = LoadClass<UUserWidget>(NULL, *PlaceAIUIPath);
-	if (PlaceAIUIClass != nullptr)
+	// 选择阵营界面
+	if (GDA)
 	{
-		M_WBP_PlaceAI = CreateWidget<UUserWidget>(GetWorld(), PlaceAIUIClass);
+		M_WBP_SelectCamp = CreateUI(GDA->WBP_SelectCamp);
+	}
+
+	// 放置界面
+	if (GDA)
+	{
+		M_WBP_PlaceAI = CreateUI(GDA->WBP_PlaceAI);
 	}
 
 	// 游戏开始后的 UI
-	FString GamePlayUIPath = FString(TEXT("Blueprint'/Game/Demo/BluePrints/UI/WBP_GamePlay.WBP_GamePlay_C'"));
-	auto GamePlayUIClass = LoadClass<UUserWidget>(NULL, *GamePlayUIPath);
-	if (GamePlayUIClass != nullptr)
+	if (GDA)
 	{
-		M_WBP_GamePlay = CreateWidget<UUserWidget>(GetWorld(), GamePlayUIClass);
+		M_WBP_GamePlay = CreateUI(GDA->WBP_GamePlay);
 	}
 
 	ShowUI();
@@ -137,14 +137,24 @@ void AMyPlayerController::RemoveUI()
 	}
 }
 
+UUserWidget* AMyPlayerController::CreateUI(FSoftClassPath SoftClassPath)
+{
+	FString UIPath = "Blueprint'";
+	UIPath.Append(SoftClassPath.ToString());
+	UIPath.Append("'");
+	UClass* UIClass = LoadClass<UUserWidget>(NULL, *UIPath);
+	UUserWidget* UI = CreateWidget<UUserWidget>(GetWorld(), UIClass);
+	return UI;
+}
+
+
 UClass* AMyPlayerController::LoadMyClass(FSoftClassPath SoftClassPath)
 {
-	//FString AIPath = "Blueprint'";
-	//AIPath.Append(SoftClassPath.ToString());
-	////AIPath.Append("_C'");
-	//UClass* AIClass = LoadClass<AMyProject02Character>(NULL, *AIPath);
-
-	return nullptr;
+	FString AIPath = "Blueprint'";
+	AIPath.Append(SoftClassPath.ToString());
+	AIPath.Append("'");
+	UClass* AIClass = LoadClass<AActor>(NULL, *AIPath);
+	return AIClass;
 }
 
 //void AMyPlayerController::HideMouse()

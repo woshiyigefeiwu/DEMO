@@ -1,3 +1,4 @@
+#include "MyGameModeBase.h"
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
@@ -19,16 +20,23 @@ AMyGameModeBase::AMyGameModeBase()
 
 void AMyGameModeBase::BeginPlay()
 {
-	//CreateGeneralConfig();
-	//AMyGameStateBase* GS = GetGameState<AMyGameStateBase>();
-	//if (GS && GeneralDataAsset)
-	//{
-	//	GS->Init(GeneralDataAsset);
-	//}
+	if (GeneralDataAsset)
+	{
+		UE_LOG(LogTemp, Error, TEXT("GeneralDataAsset YES"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("GeneralDataAsset NO"));
+	}
 }
 
-void AMyGameModeBase::CreateGeneralConfig()
+UGeneralDataAsset* AMyGameModeBase::GetGeneralDataAsset()
 {
+	return GeneralDataAsset;
+}
+
+//void AMyGameModeBase::CreateGeneralConfig()
+//{
 	//FString GeneralConfigPath = FString(TEXT("Blueprint'/Game/Demo/BluePrints/Manager/BP_GeneralConfig.BP_GeneralConfig_C'"));	// ◊¢“‚ «¿∂Õº¿‡
 	//UClass* GeneralConfigClass = LoadClass<AGeneralConfig>(NULL, *GeneralConfigPath);
 	//M_GeneralConfig = GetWorld()->SpawnActor<AGeneralConfig>(GeneralConfigClass);
@@ -38,9 +46,9 @@ void AMyGameModeBase::CreateGeneralConfig()
 	//{
 	//	GS->Init(M_GeneralConfig);
 	//}
-}
+//}
 
-AGeneralConfig* AMyGameModeBase::GetGeneralConfig()
-{
-	return M_GeneralConfig;
-}
+//AGeneralConfig* AMyGameModeBase::GetGeneralConfig()
+//{
+//	return M_GeneralConfig;
+//}

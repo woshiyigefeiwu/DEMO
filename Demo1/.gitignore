@@ -6,6 +6,9 @@
 *.lo
 *.o
 *.obj
+
+# Plugins
+Plugins/
  
 # Precompiled Headers
 *.gch

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "GeneralDataAsset.h"
 #include "GeneralConfig.h"
 
 #include "CoreMinimal.h"
@@ -19,10 +18,10 @@ class DEMO1_API AMyGameStateBase : public AGameStateBase
 	
 public:
 	UFUNCTION()
-	void Init(UGeneralDataAsset* GeneralDataAsset);
-
+	void BeginPlay() override;
+	
 	UFUNCTION()
-	void PostInitializeComponents() override;
+	void Init();
 
 	UFUNCTION()
 	TArray<FCampInfo> GetCampInfoList();

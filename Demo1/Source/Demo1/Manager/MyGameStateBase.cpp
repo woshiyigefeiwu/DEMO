@@ -1,26 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "GeneralDataAsset.h"
 
 #include "MyGameStateBase.h"
 #include "MyGameModeBase.h"
 
-void AMyGameStateBase::Init(UGeneralDataAsset* GeneralDataAsset)
+void AMyGameStateBase::BeginPlay()
 {
-	if (GeneralDataAsset)
-	{
-		M_CampInfoList = GeneralDataAsset->CampInfoList;
-		M_SoldierInfoList = GeneralDataAsset->SoldierInfoList;
-	}
+	// 初始化一下GameState
+	Init();
 }
 
-void AMyGameStateBase::PostInitializeComponents()
+void AMyGameStateBase::Init()
 {
-	Super::PostInitializeComponents();
-
 	const AMyGameModeBase* GM = Cast<AMyGameModeBase>(GetDefaultGameMode());
 	if (GM && GM->GeneralDataAsset)
 	{
-		Init(GM->GeneralDataAsset);
+		M_CampInfoList = GM->GeneralDataAsset->CampInfoList;
+		M_SoldierInfoList = GM->GeneralDataAsset->SoldierInfoList;
 	}
 }
 
