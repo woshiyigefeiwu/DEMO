@@ -8,6 +8,7 @@
 #include "Engine/DataAsset.h"
 #include "GeneralDataAsset.generated.h"
 
+// -------------------------------------------- Enum -------------------------------------------
 
 // 阵营
 UENUM(BlueprintType)
@@ -18,6 +19,25 @@ enum class ECampType : uint8
 	BLUE	=	2	UMETA(DisplayName = "Blue"),
 };
 
+// 兵种
+UENUM(BlueprintType)
+enum class ESoldierType : uint8
+{
+	NONE,
+	CLOSECOMBAT		= 1		UMETA(DisplayName = "CloseCombat"),
+	LONGRANGE		= 2		UMETA(DisplayName = "LongRange"),
+};
+
+// 选敌规则
+UENUM(BlueprintType)
+enum class EEnemySelectRule : uint8
+{
+	NONE,
+	FIRST		= 1		UMETA(DisplayName = "First"),			// 第一个发现的敌人
+	NEAREST		= 2		UMETA(DisplayName = "Nearest"),			// 最近的敌人
+};
+
+// -------------------------------------------- Struct -------------------------------------------
 
 USTRUCT(BlueprintType)
 struct FCampInfo
@@ -37,32 +57,23 @@ struct FCampInfo
 	FSoftObjectPath CampImage;		
 };
 
-// 兵种
-UENUM(BlueprintType)
-enum class ESoldierType : uint8
-{
-	NONE,
-	CLOSECOMBAT = 1		UMETA(DisplayName = "CloseCombat"),
-	LONGRANGE = 2		UMETA(DisplayName = "LongRange"),
-};
-
-USTRUCT(BlueprintType)
-struct FSoldierInfo
-{
-	GENERATED_BODY()
-
-	// 士兵的类型
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESoldierType Type;					
-
-	// 士兵的蓝图类
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FSoftClassPath SoldierClass;		
-
-	// 士兵的图片显示
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FSoftObjectPath SoldierImage;
-};
+//USTRUCT(BlueprintType)
+//struct FSoldierInfo
+//{
+//	GENERATED_BODY()
+//
+//	// 士兵的类型
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+//	ESoldierType Type;					
+//
+//	// 士兵的蓝图类
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+//	FSoftClassPath SoldierClass;		
+//
+//	// 士兵的图片显示
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+//	FSoftObjectPath SoldierImage;
+//};
 
 
 /**
@@ -77,8 +88,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FCampInfo> CampInfoList;
 
+	//UPROPERTY(EditAnywhere)
+	//TArray<FSoldierInfo> SoldierInfoList;
+
 	UPROPERTY(EditAnywhere)
-	TArray<FSoldierInfo> SoldierInfoList;
+	TArray<FSoftClassPath> SoldierInfoList;
 
 	// 游戏开始界面
 	UPROPERTY(EditAnywhere)

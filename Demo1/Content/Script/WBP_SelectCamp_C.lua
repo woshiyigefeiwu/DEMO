@@ -39,7 +39,9 @@ function WBP_SelectCamp:Init()
         local CampSubUIClass = UE.UClass.Load("/Game/Demo/BluePrints/UI/WBP_Camps.WBP_Camps_C")    -- 注意路径
         local CampSubUI = NewObject(CampSubUIClass, self);
         self.CampsList:AddChild(CampSubUI);
-        -- CampSubUI:InitInfo();   -- 初始化一下按钮的样式
+
+        -- 初始化一下按钮的样式以及阵营信息
+        CampSubUI:InitInfo(CampInfoList[i].Type);
     end
 end
 

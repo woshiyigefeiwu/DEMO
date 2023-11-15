@@ -4,6 +4,8 @@
 #include "MyGameModeBase.h"
 #include "MyPlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Demo1/AICharacter/AICharacter_Base.h"
+#include "MyGameStateBase.h"
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -148,7 +150,21 @@ UUserWidget* AMyPlayerController::CreateUI(FSoftClassPath SoftClassPath)
 }
 
 
-UClass* AMyPlayerController::LoadMyClass(FSoftClassPath SoftClassPath)
+void AMyPlayerController::SpawnAI(FSoftClassPath SoftClassPath, FVector MouseLocation)
+{
+	UClass* AIClass = LoadAIClass(SoftClassPath);
+	AAICharacter_Base* AI = GetWorld()->SpawnActor<AAICharacter_Base>(AIClass, FTransform(MouseLocation));
+	
+	AMyGameStateBase* GS = Cast<AMyGameStateBase>(GetWorld()->GetGameState());
+	// 将 AI 添加到 GS 中
+	if (AI && GS)
+	{
+		AI->SetCampType(GS->GetCurrentCamp());
+		GS->AddAI(AI);
+	}
+}
+
+UClass* AMyPlayerController::LoadAIClass(FSoftClassPath SoftClassPath)
 {
 	FString AIPath = "Blueprint'";
 	AIPath.Append(SoftClassPath.ToString());

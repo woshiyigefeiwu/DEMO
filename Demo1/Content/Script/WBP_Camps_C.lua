@@ -23,20 +23,22 @@ function WBP_Camps:Bind()
     self.CampButton.OnClicked:Add(self, self.OnClickedCampButton);
 end
 
-function WBP_Camps:InitInfo(name, image)
-
+function WBP_Camps:InitInfo(camp_type)
+    self.CampType = camp_type;
 end
 
 ------------------------- Event -----------------------------
 
 function WBP_Camps:OnClickedCampButton()
+    -- 传一个当前阵营信息给 GS , 以便数据的统计
+    local GS = UE.UGameplayStatics.GetGameState(self);
+    GS:SetCurrentCamp(self.CampType);
+
     local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
     local MyPC = MyPawn:GetController();
     if(MyPC) then
         MyPC:OnClick_SelectButton();
     end
-
-    -- 这里点击完记得还需要给 GameState 传一个 Camp_Target，用于后续创建AI的时候统计数据
 end
 
 

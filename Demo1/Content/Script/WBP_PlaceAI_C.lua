@@ -37,7 +37,7 @@ function WBP_PlaceAI:Init()
         local SoldierSubUIClass = UE.UClass.Load("/Game/Demo/BluePrints/UI/WBP_Soldiers.WBP_Soldiers_C")    -- 注意路径
         local SoldierSubUI = NewObject(SoldierSubUIClass, self);
         self.SoldierList:AddChild(SoldierSubUI);
-        SoldierSubUI:InitInfo(SoldierInfoList[i].SoldierClass);   -- 初始化一下兵种的样式
+        SoldierSubUI:InitInfo(SoldierInfoList[i]);   -- 初始化一下兵种的样式
     end
 end
 

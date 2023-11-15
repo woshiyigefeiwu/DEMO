@@ -19,6 +19,73 @@ void AMyGameStateBase::Init()
 		M_CampInfoList = GM->GeneralDataAsset->CampInfoList;
 		M_SoldierInfoList = GM->GeneralDataAsset->SoldierInfoList;
 	}
+
+	// 这里得初始化一下 AIList
+	FCamp_Solider_AIList Camp_Solider_AIList;
+	Camp_Solider_AIList.Num = 0;
+	Camp_Solider_AIList.Camp_Solider_AIList.Empty();
+
+	FCamp_AIList Camp_AIList;
+	Camp_AIList.Num = 0;
+	for (int i = 0; i < M_SoldierInfoList.Num(); i++)
+	{
+		// ----------------
+		//FString AIPath = "Blueprint'";
+		//AIPath.Append(M_SoldierInfoList[i].ToString());
+		//AIPath.Append("'");
+		//UClass* AIClass = LoadClass<AActor>(NULL, *AIPath);
+
+		//// 通过反射，获取类的属性（...）
+		//for (TFieldIterator<UProperty> it(AIClass); it; ++it)
+		//{
+		//	if (it->GetName() == "SoldierType")
+		//	{
+		//		UEnumProperty* PropertyValue = Cast<UEnumProperty>(*it);
+		//		ESoldierType* Param = it->ContainerPtrToValuePtr<ESoldierType>(AIClass->GetDefaultObject());
+		//		if (Param)
+		//		{
+		//			if ((*Param) == ESoldierType::CLOSECOMBAT)
+		//			{
+		//				CurrentSoldierType = ESoldierType::CLOSECOMBAT;
+		//				//UE_LOG(LogTemp, Error, TEXT("this is CLOSECOMBAT"));
+		//			}
+		//			else if ((*Param) == ESoldierType::LONGRANGE)
+		//			{
+		//				CurrentSoldierType = ESoldierType::LONGRANGE;
+		//				//UE_LOG(LogTemp, Error, TEXT("this is LONGRANGE"));
+		//			}
+		//		}
+		//	}
+		//}
+
+		// ----------------
+
+		FString AIPath = "Blueprint'";
+		AIPath.Append(M_SoldierInfoList[i].ToString());
+		AIPath.Append("'");
+		UClass* AIClass = LoadClass<AAICharacter_Base>(NULL, *AIPath);
+		
+		ESoldierType CurrentSoldierType = ESoldierType::NONE;
+
+		if (AIClass)
+		{
+			AAICharacter_Base* AI_Base = Cast<AAICharacter_Base>(AIClass->GetDefaultObject());
+			if (AI_Base)
+			{
+				CurrentSoldierType = AI_Base->GetSoldierType();
+			}
+		}
+
+		if (CurrentSoldierType != ESoldierType::NONE && !Camp_AIList.Camp_AIList.Contains(CurrentSoldierType))
+		{
+			Camp_AIList.Camp_AIList.Add(CurrentSoldierType, Camp_Solider_AIList);
+		}
+	}
+	
+	for (int i = 0; i < M_CampInfoList.Num(); i++)
+	{
+		M_AIList.Add(M_CampInfoList[i].Type, Camp_AIList);
+	}
 }
 
 TArray<FCampInfo> AMyGameStateBase::GetCampInfoList()
@@ -26,8 +93,46 @@ TArray<FCampInfo> AMyGameStateBase::GetCampInfoList()
 	return M_CampInfoList;
 }
 
-TArray<FSoldierInfo> AMyGameStateBase::GetSoldierInfoList()
+TArray<FSoftClassPath> AMyGameStateBase::GetSoldierInfoList()
 {
 	//M_SoldierInfoList[0].SoldierClass.;
 	return M_SoldierInfoList;
+}
+
+void AMyGameStateBase::SetCurrentCamp(ECampType CurrentCamp)
+{
+	M_CurrentCamp = CurrentCamp;
+}
+
+ECampType AMyGameStateBase::GetCurrentCamp()
+{
+	return M_CurrentCamp;
+}
+
+// 添加 AI
+void AMyGameStateBase::AddAI(AAICharacter_Base* AI)
+{
+	ECampType CampType = AI->GetCampType();
+	ESoldierType SoldierType = AI->GetSoldierType();
+
+	if (M_AIList.Contains(CampType))
+	{
+		FCamp_AIList* Camp_AIList_Ptr = &M_AIList[CampType];
+		if (Camp_AIList_Ptr->Camp_AIList.Contains(SoldierType))
+		{
+			FCamp_Solider_AIList* Camp_Solider_AIList_Ptr = &Camp_AIList_Ptr->Camp_AIList[SoldierType];
+			
+			Camp_Solider_AIList_Ptr->Camp_Solider_AIList.Add(AI);
+			Camp_Solider_AIList_Ptr->Num++;
+			Camp_AIList_Ptr->Num++;
+
+			// --------------- test out -------------------------
+			UEnum* const CampType_Prt = StaticEnum<ECampType>();
+			UEnum* const SoldierType_Prt = StaticEnum<ESoldierType>();
+			auto camp_type = CampType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(CampType));
+			auto soldier_type = SoldierType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(SoldierType));
+			UE_LOG(LogTemp, Error, TEXT("Camp is : %s -------- Solier is : %s ----------"),*camp_type.ToString(), *soldier_type.ToString());
+			UE_LOG(LogTemp, Error, TEXT("Camp num is : %d -------- Solier num is : %d ----------"), Camp_AIList_Ptr->Num, Camp_Solider_AIList_Ptr->Num);
+		}
+	}
 }

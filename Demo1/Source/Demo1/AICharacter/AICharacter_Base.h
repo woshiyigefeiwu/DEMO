@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Demo1/Manager/GeneralDataAsset.h"
+#include "BehaviorTree/BehaviorTree.h"
 
 #include "CoreMinimal.h"
 #include "Demo1/Demo1Character.h"
@@ -16,9 +17,25 @@ class DEMO1_API AAICharacter_Base : public ADemo1Character
 {
 	GENERATED_BODY()
 	
+
 public:
 	AAICharacter_Base();
 
+	UFUNCTION()
+	ECampType GetCampType();
+
+	UFUNCTION()
+	void SetCampType(ECampType CampType);
+
+	UFUNCTION()
+	ESoldierType GetSoldierType();
+
+	UFUNCTION()
+	UBehaviorTree* GetBTree();
+
+	UFUNCTION()
+	void UpdateWalkSpeed(float Speed);
+	
 protected:
 	// 最大生命值
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
@@ -27,9 +44,6 @@ protected:
 	// 攻击力
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
 	float Atk;
-
-	// 攻击方式（这个比较麻烦...）
-
 
 	// 攻击 CD
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
@@ -51,10 +65,38 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
 	float RotateSpeed;
 
+	// 攻击方式（直接放在派生类就行）
+
+	// 当前兵种的类型
+	UPROPERTY(EditAnywhere, Category = "BaseConfig")
+	ESoldierType SoldierType;
+
+	// 当前 AI 使用的行为树
+	UPROPERTY(EditAnywhere, Category = "BaseConfig")
+	UBehaviorTree* BTree = nullptr;
+
+	// 选敌规则
+	UPROPERTY(EditAnywhere, Category = "BaseConfig")
+	EEnemySelectRule EnemySelectRule;
+
+	// 感知半径（发现敌人的范围，发起追击）
+	UPROPERTY(EditAnywhere, Category = "BaseConfig")
+	float PerceptionRadius;
+
+	// 离开感知的半径
+	UPROPERTY(EditAnywhere, Category = "BaseConfig")
+	float LosePerceptionRadius;
+	
+	// 攻击范围（追击敌人到此范围内的时候就发起攻击）
+	UPROPERTY(EditAnywhere, Category = "BaseConfig")
+	float AttackRadius;
+
 private:
 	// 当前生命值
+	UPROPERTY()
 	float M_CurrentHP;
 
 	// 属于哪个阵营
-	ECampType M_Camp;
+	UPROPERTY()
+	ECampType M_CampType;
 };

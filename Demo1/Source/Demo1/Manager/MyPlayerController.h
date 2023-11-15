@@ -20,6 +20,8 @@ public:
 	UFUNCTION()
 	void BeginPlay() override;
 
+	// ---------------------------- UI -------------------------
+
 	UFUNCTION()
 	void LoadUI();
 
@@ -63,8 +65,18 @@ public:
 	UFUNCTION()
 	UUserWidget* CreateUI(FSoftClassPath SoftClassPath);
 
+	
+
+	
+	// ------------------------------------------ spawn AI -----------------------------------------
+
 	UFUNCTION(BlueprintCallable)
-	UClass* LoadMyClass(FSoftClassPath SoftClassPath);
+	void SpawnAI(FSoftClassPath SoftClassPath, FVector MouseLocation);
+
+	UFUNCTION()
+	UClass* LoadAIClass(FSoftClassPath SoftClassPath);
+
+	// ------------------------------------------ other --------------------------------------------
 
 	//UFUNCTION()
 	//void HideMouse();
