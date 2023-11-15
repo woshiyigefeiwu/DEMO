@@ -33,8 +33,8 @@ public:
 	UFUNCTION()
 	UBehaviorTree* GetBTree();
 
-	UFUNCTION()
-	void UpdateWalkSpeed(float Speed);
+	UFUNCTION(BlueprintCallable)
+	void UpdateWalkSpeed();
 	
 protected:
 	// 最大生命值

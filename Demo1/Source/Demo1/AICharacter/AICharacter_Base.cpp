@@ -2,6 +2,7 @@
 
 
 #include "AICharacter_Base.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AAICharacter_Base::AAICharacter_Base()
 {
@@ -20,10 +21,10 @@ UBehaviorTree* AAICharacter_Base::GetBTree()
 	return BTree;
 }
 
-void AAICharacter_Base::UpdateWalkSpeed(float Speed)
+void AAICharacter_Base::UpdateWalkSpeed()
 {
-	CharacterMovementComponent* Movement = GetCharacterMovement();
-	Movement->MaxWalkSpeed = Speed;
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	Movement->MaxWalkSpeed = MoveSpeed;
 }
 
 ECampType AAICharacter_Base::GetCampType()
