@@ -11,27 +11,24 @@ local WBP_GameStart = UnLua.Class()
 
 local IsFirstTimes = true;
 
--- 协程
-local function run(self)
-    UE.UKismetSystemLibrary.Delay(self, 0.5) -- 延迟一下
-    self:Bind()
-end
-
 function WBP_GameStart:Construct()
-    if(IsFirstTimes) then
-        coroutine.resume(coroutine.create(run),self)
-        IsFirstTimes = false;
-    end
+    self:Bind() 
 end
 
 function WBP_GameStart:Bind()
     self.PlaceStageButton.OnClicked:Add(self, self.OnClickedPlace);
     self.StartStageButton.OnClicked:Add(self, self.OnClickedStart);
+
+    local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
+    local MyPC = MyPawn:GetController();
+    print("WBP_GameStart:Bind()");
+    self:PauseGame();   -- 蓝图，暂停游戏
 end
 
 ----------------------------- Event -----------------------------
 
 function WBP_GameStart:OnClickedPlace()
+    -- print("OnClickedPlace")
     local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
     local MyPC = MyPawn:GetController();
     if(MyPC) then
@@ -40,6 +37,7 @@ function WBP_GameStart:OnClickedPlace()
 end
 
 function WBP_GameStart:OnClickedStart()
+    self:ReleaseGame();
     local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
     local MyPC = MyPawn:GetController();
     if(MyPC) then

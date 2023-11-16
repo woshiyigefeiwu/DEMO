@@ -62,6 +62,9 @@ public:
 	UFUNCTION()
 	void RemoveUI();
 
+	UFUNCTION(BlueprintCallable)
+	void RemoveAllUI();
+
 	UFUNCTION()
 	UUserWidget* CreateUI(FSoftClassPath SoftClassPath);
 

@@ -61,6 +61,19 @@ void AMyPlayerController::LoadUI()
 		M_WBP_GamePlay = CreateUI(GDA->WBP_GamePlay);
 	}
 
+	//UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+	M_WBP_Target = M_WBP_GameStart;
+	if (M_WBP_Target)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UI YES"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UI NO"));
+	}
+
+
 	ShowUI();
 }
 
@@ -137,6 +150,11 @@ void AMyPlayerController::RemoveUI()
 	{
 		M_WBP_Target->RemoveFromParent();
 	}
+}
+
+void AMyPlayerController::RemoveAllUI()
+{
+	RemoveUI();
 }
 
 UUserWidget* AMyPlayerController::CreateUI(FSoftClassPath SoftClassPath)

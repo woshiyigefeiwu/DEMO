@@ -3,7 +3,6 @@
 
 #include "AIController_Base.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "Demo1/AICharacter/AICharacter_Base.h"
 
 AAIController_Base::AAIController_Base()
@@ -31,7 +30,7 @@ void AAIController_Base::BeginPlay()
 
 AAICharacter_Base* AAIController_Base::SelectTarget(EEnemySelectRule SelectRule, TArray<AAICharacter_Base*> AI_Array)
 {
-	if (SelectRule == EEnemySelectRule::FIRST)
+	if (SelectRule == EEnemySelectRule::FIRST || SelectRule == EEnemySelectRule::NONE)
 	{
 		return this->SelectTarget_First(AI_Array);
 	}
@@ -69,4 +68,9 @@ AAICharacter_Base* AAIController_Base::SelectTarget_Nearest(TArray<AAICharacter_
 	// 找一下所有的敌人的指针 -> 获取位置 -> 算一下到 this 的距离，然后存在另一个数组里（dis，AIi），然后排序，然后取出来，在原数组中删除。
 
 	return nullptr;
+}
+
+UBlackboardComponent* AAIController_Base::GetBlackboard()
+{
+	return M_Blackboard;
 }

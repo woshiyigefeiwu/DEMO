@@ -21,6 +21,8 @@ class DEMO1_API AAICharacter_Base : public ADemo1Character
 public:
 	AAICharacter_Base();
 
+	void Tick(float DeltaSeconds) override;
+
 	UFUNCTION()
 	ECampType GetCampType();
 
@@ -36,7 +38,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateWalkSpeed();
 	
-protected:
+	UFUNCTION()
+	AAICharacter_Base* GetLockedEnemy();
+
+	UFUNCTION()
+	void SetLockedEnemy(AAICharacter_Base* Enemy);
+	
+	UFUNCTION()
+	bool IsAttack();
+
+	UFUNCTION()
+	void UpdateAttackState();
+
+public:
 	// 最大生命值
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
 	float MaxHP;
@@ -99,4 +113,8 @@ private:
 	// 属于哪个阵营
 	UPROPERTY()
 	ECampType M_CampType;
+
+	// 当前 AI 锁定到的 Enemy AI
+	UPROPERTY()
+	AAICharacter_Base* M_LockedEnemy = nullptr;
 };

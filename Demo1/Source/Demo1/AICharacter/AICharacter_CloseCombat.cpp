@@ -5,5 +5,5 @@
 
 void AAICharacter_CloseCombat::BeginPlay()
 {
-	
+	Super::BeginPlay();
 }

@@ -9,14 +9,8 @@
 ---@type WBP_Camps_C
 local WBP_Camps = UnLua.Class()
 
--- 协程
-local function run(self)
-    UE.UKismetSystemLibrary.Delay(self, 0.5) -- 延迟一下
-    self:Bind()
-end
-
 function WBP_Camps:Construct()
-    coroutine.resume(coroutine.create(run),self)
+    self:Bind()
 end
 
 function WBP_Camps:Bind()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "AIController_Base.generated.h"
 
 /**
@@ -30,17 +31,16 @@ public:
 	// 找距离最近的敌人
 	virtual AAICharacter_Base* SelectTarget_Nearest(TArray<AAICharacter_Base*> AI_Array);
 
+	UFUNCTION()
+	UBlackboardComponent* GetBlackboard();
+
 public:
 
 
-private:
+protected:
 	UPROPERTY()
 	class UBehaviorTreeComponent* M_BehaviorTree;
 
 	UPROPERTY()
 	class UBlackboardComponent* M_Blackboard;
-
-
-
-
 };
