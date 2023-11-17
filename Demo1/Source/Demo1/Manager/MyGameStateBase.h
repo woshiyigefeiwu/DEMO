@@ -9,6 +9,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "MyGameStateBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverDelegate);
 
 // 当前阵营，当前兵种下的所有AI
 USTRUCT(BlueprintType)
@@ -65,6 +66,13 @@ public:
 
 	UFUNCTION()
 	void AddAI(AAICharacter_Base* AI);
+
+	UFUNCTION()
+	void DeleteAI(AAICharacter_Base* AI);
+
+public:
+	UPROPERTY()
+	FGameOverDelegate GameOverDelegate;
 
 private:
 	UPROPERTY(EditAnywhere)

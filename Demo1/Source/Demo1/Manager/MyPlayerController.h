@@ -20,6 +20,9 @@ public:
 	UFUNCTION()
 	void BeginPlay() override;
 
+	UFUNCTION()
+	void Init();
+
 	// ---------------------------- UI -------------------------
 
 	UFUNCTION()
@@ -67,9 +70,6 @@ public:
 
 	UFUNCTION()
 	UUserWidget* CreateUI(FSoftClassPath SoftClassPath);
-
-	
-
 	
 	// ------------------------------------------ spawn AI -----------------------------------------
 
@@ -80,6 +80,9 @@ public:
 	UClass* LoadAIClass(FSoftClassPath SoftClassPath);
 
 	// ------------------------------------------ other --------------------------------------------
+
+	UFUNCTION()
+	void OnGameOver();
 
 	//UFUNCTION()
 	//void HideMouse();
@@ -103,4 +106,7 @@ private:
 
 	UPROPERTY()
 	UUserWidget* M_WBP_GamePlay = nullptr;
+
+	UPROPERTY()
+	UUserWidget* M_WBP_GameOver = nullptr;
 };

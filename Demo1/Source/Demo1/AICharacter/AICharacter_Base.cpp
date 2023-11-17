@@ -7,18 +7,19 @@
 
 AAICharacter_Base::AAICharacter_Base()
 {
-	//GetClass()->FindPropertyByName();
-
 
 }
 
 void AAICharacter_Base::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	UpdateAttackState();
-
 	
+}
+
+// 初始化一下信息
+void AAICharacter_Base::Init()
+{
+	M_CurrentHP = MaxHP;
 }
 
 ESoldierType AAICharacter_Base::GetSoldierType()
@@ -37,16 +38,6 @@ void AAICharacter_Base::UpdateWalkSpeed()
 	Movement->MaxWalkSpeed = MoveSpeed;
 }
 
-AAICharacter_Base* AAICharacter_Base::GetLockedEnemy()
-{
-	return M_LockedEnemy;
-}
-
-void AAICharacter_Base::SetLockedEnemy(AAICharacter_Base* Enemy)
-{
-	M_LockedEnemy = Enemy;
-}
-
 // 是否在攻击状态
 bool AAICharacter_Base::IsAttack()
 {
@@ -63,50 +54,20 @@ bool AAICharacter_Base::IsAttack()
 	return is_attack;
 }
 
-void AAICharacter_Base::UpdateAttackState()
+bool AAICharacter_Base::IsDead()
 {
-	
-	//if (!IsAttack())
-	//{
-		AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
+	return M_IsDead;
+}
 
-		// 检查一下当前两者之间的距离
-		if (M_LockedEnemy)
-		{
-			float dis = FVector::Distance(GetActorLocation(), M_LockedEnemy->GetActorLocation());
-			if (dis <= AttackRadius)
-			{
-				if (AIC)
-				{
-					// 不是攻击状态才需要设置
-					if (AIC->GetBlackboard() && !AIC->GetBlackboard()->GetValueAsBool(FName("IsAttack")))
-					{
-						AIC->GetBlackboard()->SetValueAsBool(FName("IsAttack"), true);
-					}
-				}
-			}
-			else
-			{
-				if (AIC)
-				{
-					if (AIC->GetBlackboard() && AIC->GetBlackboard()->GetValueAsBool(FName("IsAttack")))
-					{
-						AIC->GetBlackboard()->SetValueAsBool(FName("IsAttack"), false);
-					}
-				}
-			}
-		}
-		else
-		{
-			if (AIC)
-			{
-				if (AIC->GetBlackboard() && AIC->GetBlackboard()->GetValueAsBool(FName("IsAttack")))
-				{
-					AIC->GetBlackboard()->SetValueAsBool(FName("IsAttack"), false);
-				}
-			}
-		}
-	//}
+void AAICharacter_Base::SetDeadState(bool DeadState)
+{
+	M_IsDead = DeadState;
+}
+
+float AAICharacter_Base::SetCurrentHP(float NewHP)
+{
+	M_CurrentHP = NewHP;
+	return M_CurrentHP;
 }
 
 ECampType AAICharacter_Base::GetCampType()

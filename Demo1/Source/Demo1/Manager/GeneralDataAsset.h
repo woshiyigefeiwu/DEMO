@@ -109,4 +109,8 @@ public:
 	// 游戏进行时界面
 	UPROPERTY(EditAnywhere)
 	FSoftClassPath WBP_GamePlay;
+
+	// 游戏结束界面
+	UPROPERTY(EditAnywhere)
+	FSoftClassPath WBP_GameOver;
 };

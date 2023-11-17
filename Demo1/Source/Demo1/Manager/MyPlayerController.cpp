@@ -18,11 +18,22 @@ void AMyPlayerController::BeginPlay()
 {
 	//GetWorldTimerManager().SetTimer(M_TimerHandle, this, &AMyPlayerController::HideMouse, 5.0f, false);
 
+	Init();
+
 	// why ?
 	//if (GetLocalRole() == ROLE_AutonomousProxy)
 	//{
 		LoadUI();
 	//}
+}
+
+void AMyPlayerController::Init()
+{
+	AMyGameStateBase* GS = Cast<AMyGameStateBase>(GetWorld()->GetGameState());
+	if (GS)
+	{
+		GS->GameOverDelegate.AddDynamic(this, &AMyPlayerController::OnGameOver);
+	}
 }
 
 void AMyPlayerController::LoadUI()
@@ -61,6 +72,12 @@ void AMyPlayerController::LoadUI()
 		M_WBP_GamePlay = CreateUI(GDA->WBP_GamePlay);
 	}
 
+	// ÓÎÏ·½áÊø UI
+	if (GDA)
+	{
+		M_WBP_GameOver = CreateUI(GDA->WBP_GameOver);
+	}
+
 	//UGameplayStatics::SetGamePaused(GetWorld(), true);
 
 	M_WBP_Target = M_WBP_GameStart;
@@ -72,7 +89,6 @@ void AMyPlayerController::LoadUI()
 	{
 		UE_LOG(LogTemp, Error, TEXT("UI NO"));
 	}
-
 
 	ShowUI();
 }
@@ -163,7 +179,13 @@ UUserWidget* AMyPlayerController::CreateUI(FSoftClassPath SoftClassPath)
 	UIPath.Append(SoftClassPath.ToString());
 	UIPath.Append("'");
 	UClass* UIClass = LoadClass<UUserWidget>(NULL, *UIPath);
-	UUserWidget* UI = CreateWidget<UUserWidget>(GetWorld(), UIClass);
+
+	UUserWidget* UI = nullptr;
+	if (UIClass)
+	{
+		UI = CreateWidget<UUserWidget>(GetWorld(), UIClass);
+	}
+	
 	return UI;
 }
 
@@ -189,6 +211,15 @@ UClass* AMyPlayerController::LoadAIClass(FSoftClassPath SoftClassPath)
 	AIPath.Append("'");
 	UClass* AIClass = LoadClass<AActor>(NULL, *AIPath);
 	return AIClass;
+}
+
+void AMyPlayerController::OnGameOver()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, FString::Printf(TEXT("this is OnGameOver()")));
+
+	RemoveUI();
+	SetUI(M_WBP_GameOver);
+	ShowUI();
 }
 
 //void AMyPlayerController::HideMouse()

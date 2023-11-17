@@ -34,8 +34,15 @@ public:
 	UFUNCTION()
 	UBlackboardComponent* GetBlackboard();
 
-public:
+	// AI 死后的处理（包括数据什么的）
+	virtual void PossessAIDead();
 
+	// AI 攻击过后的处理
+	virtual void FinishAttack();
+
+	// 清空定时器
+	UFUNCTION()
+	void ClearTimerHandle();
 
 protected:
 	UPROPERTY()
@@ -43,4 +50,7 @@ protected:
 
 	UPROPERTY()
 	class UBlackboardComponent* M_Blackboard;
+
+	UPROPERTY()
+	FTimerHandle M_TimerHandle;
 };

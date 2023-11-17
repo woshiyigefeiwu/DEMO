@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GeneralDataAsset.h"
+#include "Kismet/GameplayStatics.h"
+#include "MyPlayerController.h"
 
 #include "MyGameStateBase.h"
 #include "MyGameModeBase.h"
@@ -131,8 +133,42 @@ void AMyGameStateBase::AddAI(AAICharacter_Base* AI)
 			UEnum* const SoldierType_Prt = StaticEnum<ESoldierType>();
 			auto camp_type = CampType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(CampType));
 			auto soldier_type = SoldierType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(SoldierType));
-			UE_LOG(LogTemp, Error, TEXT("Camp is : %s -------- Solier is : %s ----------"),*camp_type.ToString(), *soldier_type.ToString());
-			UE_LOG(LogTemp, Error, TEXT("Camp num is : %d -------- Solier num is : %d ----------"), Camp_AIList_Ptr->Num, Camp_Solider_AIList_Ptr->Num);
+			UE_LOG(LogTemp, Error, TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num);
+			GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Green, FString::Printf(TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num));
 		}
+	}
+}
+
+// 删除 AI
+void AMyGameStateBase::DeleteAI(AAICharacter_Base* AI)
+{
+	ECampType CampType = AI->GetCampType();
+	ESoldierType SoldierType = AI->GetSoldierType();
+
+	if (M_AIList.Contains(CampType))
+	{
+		FCamp_AIList* Camp_AIList_Ptr = &M_AIList[CampType];
+		if (Camp_AIList_Ptr->Camp_AIList.Contains(SoldierType))
+		{
+			FCamp_Solider_AIList* Camp_Solider_AIList_Ptr = &Camp_AIList_Ptr->Camp_AIList[SoldierType];
+
+			Camp_Solider_AIList_Ptr->Camp_Solider_AIList.Remove(AI);
+			Camp_Solider_AIList_Ptr->Num--;
+			Camp_AIList_Ptr->Num--;
+
+			UEnum* const CampType_Prt = StaticEnum<ECampType>();
+			UEnum* const SoldierType_Prt = StaticEnum<ESoldierType>();
+			auto camp_type = CampType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(CampType));
+			auto soldier_type = SoldierType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(SoldierType));
+			UE_LOG(LogTemp, Error, TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num);
+			GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Green, FString::Printf(TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num));
+		}
+	}
+
+	// 一方阵亡
+	if (M_AIList.Contains(CampType) && M_AIList[CampType].Num <= 0)
+	{
+		// 抛事件出去，PC
+		GameOverDelegate.Broadcast();
 	}
 }

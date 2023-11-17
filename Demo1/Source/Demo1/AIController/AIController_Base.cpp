@@ -4,6 +4,7 @@
 #include "AIController_Base.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Demo1/AICharacter/AICharacter_Base.h"
+#include "Demo1/Manager/MyGamestateBase.h"
 
 AAIController_Base::AAIController_Base()
 {
@@ -42,12 +43,12 @@ AAICharacter_Base* AAIController_Base::SelectTarget(EEnemySelectRule SelectRule,
 	return nullptr;
 }
 
-// 找第一个发现的敌人
+// 找第一个发现的敌人（合法的）
 AAICharacter_Base* AAIController_Base::SelectTarget_First(TArray<AAICharacter_Base*> AI_Array)
 {
 	AAICharacter_Base* Target = nullptr;
 
-	while (AI_Array.Num() && AI_Array[0] == nullptr)
+	while (AI_Array.Num() && (AI_Array[0] == nullptr || AI_Array[0]->IsDead()))
 	{
 		AI_Array.RemoveAt(0);
 	}
@@ -73,4 +74,38 @@ AAICharacter_Base* AAIController_Base::SelectTarget_Nearest(TArray<AAICharacter_
 UBlackboardComponent* AAIController_Base::GetBlackboard()
 {
 	return M_Blackboard;
+}
+
+// 主要做一些数据的处理
+void AAIController_Base::PossessAIDead()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is PossessAIDead(), DataUpdate");
+
+	AAICharacter_Base* AI = Cast<AAICharacter_Base>(GetPawn());
+	AMyGameStateBase* GS = Cast<AMyGameStateBase>(GetWorld()->GetGameState());
+	
+	if (GS)
+	{
+		GS->DeleteAI(AI);
+	}
+}
+
+// AI 完成攻击之后的善后处理
+void AAIController_Base::FinishAttack()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Yellow, "this is AAIController_CloseCombat::FinishAttack()");
+
+	AAICharacter_Base* PossessAI = Cast<AAICharacter_Base>(GetPawn());
+	if (PossessAI)
+	{
+		GetWorldTimerManager().SetTimer(M_TimerHandle, this, &AAIController_Base::ClearTimerHandle, PossessAI->AtkCD, false);
+	}
+}
+
+// 清空定时器
+void AAIController_Base::ClearTimerHandle()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Yellow, "this is AAIController_CloseCombat::ClearTimerHandle()");
+
+	GetWorldTimerManager().ClearTimer(M_TimerHandle);
 }

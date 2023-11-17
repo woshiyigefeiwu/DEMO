@@ -9,6 +9,8 @@
 #include "Demo1/Demo1Character.h"
 #include "AICharacter_Base.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAttackDelegate);
+
 /**
  * 
  */
@@ -24,6 +26,9 @@ public:
 	void Tick(float DeltaSeconds) override;
 
 	UFUNCTION()
+	virtual void Init();
+
+	UFUNCTION()
 	ECampType GetCampType();
 
 	UFUNCTION()
@@ -37,18 +42,19 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateWalkSpeed();
-	
-	UFUNCTION()
-	AAICharacter_Base* GetLockedEnemy();
 
-	UFUNCTION()
-	void SetLockedEnemy(AAICharacter_Base* Enemy);
-	
 	UFUNCTION()
 	bool IsAttack();
 
+	// 是否死亡
 	UFUNCTION()
-	void UpdateAttackState();
+	bool IsDead();
+
+	UFUNCTION()
+	void SetDeadState(bool DeadState);
+
+	UFUNCTION()
+	float SetCurrentHP(float NewHP);
 
 public:
 	// 最大生命值
@@ -105,7 +111,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
 	float AttackRadius;
 
-private:
+protected:
 	// 当前生命值
 	UPROPERTY()
 	float M_CurrentHP;
@@ -114,7 +120,10 @@ private:
 	UPROPERTY()
 	ECampType M_CampType;
 
-	// 当前 AI 锁定到的 Enemy AI
+	// 是否属于死亡状态
 	UPROPERTY()
-	AAICharacter_Base* M_LockedEnemy = nullptr;
+	bool M_IsDead = false;
+	 
+	UPROPERTY(BlueprintAssignable)
+	FAttackDelegate AttackDelegate;
 };

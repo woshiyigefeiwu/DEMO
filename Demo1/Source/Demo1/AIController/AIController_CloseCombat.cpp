@@ -4,6 +4,7 @@
 #include "AIController_CloseCombat.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AAIController_CloseCombat::AAIController_CloseCombat()
 {
@@ -20,11 +21,12 @@ void AAIController_CloseCombat::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
+	AAICharacter_Base* AI_CloseCombat = Cast<AAICharacter_Base>(InPawn);
+
+	// 处理一下感知组件
 	if (SightConfig)
 	{
 		// 这一块的配置直接去 AI 上面取就行
-		AAICharacter_CloseCombat* AI_CloseCombat = Cast<AAICharacter_CloseCombat>(InPawn);
-
 		if (AI_CloseCombat)
 		{
 			SightConfig->SightRadius = AI_CloseCombat->PerceptionRadius;
@@ -44,6 +46,11 @@ void AAIController_CloseCombat::OnPossess(APawn* InPawn)
 	{
 		M_AIPerception->ConfigureSense(*SightConfig);
 	}
+
+	if (AI_CloseCombat)
+	{
+		AI_CloseCombat->Init();
+	}
 }
 
 void AAIController_CloseCombat::BeginPlay()
@@ -59,13 +66,91 @@ void AAIController_CloseCombat::BeginPlay()
 
 }
 
+void AAIController_CloseCombat::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	// 更新一下状态
+	UpdateState();
+
+	// 尝试发出攻击
+	TryAttack();
+
+}
+
+// --------------------------------------------- AI Behavior Tree ------------------------------------------------
+
+AAICharacter_Base* AAIController_CloseCombat::GetLockedEnemy()
+{
+	return M_LockedEnemy;
+}
+
+void AAIController_CloseCombat::SetLockedEnemy(AAICharacter_Base* Enemy)
+{
+	M_LockedEnemy = Enemy;
+}
+
+// 更新一下是否进入攻击范围的状态
+void AAIController_CloseCombat::UpdateState()
+{
+	AAICharacter_Base* PossessAI = Cast<AAICharacter_Base>(GetPawn());
+
+	if (PossessAI == nullptr || PossessAI->IsDead()) return;
+
+	// 目标存在，且未死亡
+	if (M_LockedEnemy && !M_LockedEnemy->IsDead())
+	{
+		float dis = FVector::Distance(PossessAI->GetActorLocation(), M_LockedEnemy->GetActorLocation());
+		if (dis <= PossessAI->AttackRadius)
+		{
+			if (GetBlackboard() && !GetBlackboard()->GetValueAsBool(FName("IsInAttackRange")))
+			{
+				GetBlackboard()->SetValueAsBool(FName("IsInAttackRange"), true);
+			}
+		}
+		else
+		{
+			if (GetBlackboard() && GetBlackboard()->GetValueAsBool(FName("IsInAttackRange")))
+			{
+				GetBlackboard()->SetValueAsBool(FName("IsInAttackRange"), false);
+			}
+		}
+	}
+	// 不存在或者死亡，则设置一下 Target 为空，且重置攻击范围状态
+	else
+	{
+		if (GetBlackboard() && GetBlackboard()->GetValueAsObject(FName("Target")))
+		{
+			GetBlackboard()->SetValueAsObject(FName("Target"), nullptr);
+		}
+
+		if (GetBlackboard() && GetBlackboard()->GetValueAsBool(FName("IsInAttackRange")))
+		{
+			GetBlackboard()->SetValueAsBool(FName("IsInAttackRange"), false);
+		}
+	}
+}
+
+// 尝试发出攻击
+void AAIController_CloseCombat::TryAttack()
+{
+	AAICharacter_CloseCombat* PossessAI = Cast<AAICharacter_CloseCombat>(GetPawn());
+	bool IsInAttackRange = GetBlackboard()->GetValueAsBool(FName("IsInAttackRange"));
+
+	// 当前属于攻击范围内，且定时器句柄不在，才发起一次攻击
+	if (PossessAI && IsInAttackRange && !GetWorldTimerManager().IsTimerActive(M_TimerHandle))
+	{
+		PossessAI->AttackEnemy();
+	}
+}
+
 void AAIController_CloseCombat::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	AAICharacter_Base* Enemy = Cast<AAICharacter_Base>(Actor);
 	AAICharacter_Base* PossessAI = Cast<AAICharacter_Base>(GetPawn());
 
-	// 同阵营直接跳过
-	if (!Enemy || !PossessAI || (Enemy->GetCampType() == PossessAI->GetCampType()))
+	// 死亡，同阵营直接跳过
+	if (!Enemy || Enemy->IsDead() || !PossessAI || PossessAI->IsDead() || (Enemy->GetCampType() == PossessAI->GetCampType()))
 	{
 		return;
 	}
@@ -73,6 +158,8 @@ void AAIController_CloseCombat::OnTargetPerceptionUpdated(AActor* Actor, FAIStim
 	// 进入感知
 	if (Stimulus.WasSuccessfullySensed())
 	{
+		M_Blackboard->SetValueAsBool("IsPerception", true);		// 用于打断巡逻任务
+
 		if (!M_EnemyArray.Contains(Enemy))
 		{
 			M_EnemyArray.Add(Enemy);
@@ -85,23 +172,23 @@ void AAIController_CloseCombat::OnTargetPerceptionUpdated(AActor* Actor, FAIStim
 		if (Actor == M_Blackboard->GetValueAsObject("Target"))
 		{
 			M_Blackboard->SetValueAsObject("Target", nullptr);
-			PossessAI->SetLockedEnemy(nullptr);
+			SetLockedEnemy(nullptr);
 		}
 
 		// 如果队列里面有，则删除
-		if (Enemy && M_EnemyArray.Contains(Enemy))
+		if (M_EnemyArray.Contains(Enemy))
 		{
 			M_EnemyArray.Remove(Enemy);
 		}
 	}
-
-	SetIsPerception(true);
 }
 
 void AAIController_CloseCombat::FindTarget()
 {
 	AAICharacter_Base* Target = Cast<AAICharacter_Base>(M_Blackboard->GetValueAsObject("Target"));
-	if (Target)
+
+	// 有目标且目标未死亡
+	if (Target && !Target->IsDead())
 	{
 		return;
 	}
@@ -113,14 +200,47 @@ void AAIController_CloseCombat::FindTarget()
 		Target = SelectTarget(PossessAI->EnemySelectRule, M_EnemyArray);
 	}
 	
-	if (Target)
-	{
-		M_Blackboard->SetValueAsObject(FName("Target"), Target);
-	}
-	PossessAI->SetLockedEnemy(Target);
+	M_Blackboard->SetValueAsObject(FName("Target"), Target);
+	SetLockedEnemy(Target);
+
+	// 重置 IsPerception，以便 AI 可以巡逻
+	M_Blackboard->SetValueAsBool("IsPerception", false);		
 }
 
-void AAIController_CloseCombat::SetIsPerception(bool flag)
+// ------------------------------------------------------ Combat System ----------------------------------------------------------
+
+//// AI 完成攻击之后的善后处理
+//void AAIController_CloseCombat::FinishAttack()
+//{
+//	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Yellow, "this is AAIController_CloseCombat::FinishAttack()");
+//
+//	AAICharacter_Base* PossessAI = Cast<AAICharacter_Base>(GetPawn());
+//	if (PossessAI)
+//	{
+//		GetWorldTimerManager().SetTimer(M_TimerHandle, this, &AAIController_CloseCombat::ClearTimerHandle, PossessAI->AtkCD, false);
+//	}
+//}
+//
+//// 清空定时器
+//void AAIController_CloseCombat::ClearTimerHandle()
+//{
+//	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Yellow, "this is AAIController_CloseCombat::ClearTimerHandle()");
+//
+//	GetWorldTimerManager().ClearTimer(M_TimerHandle);
+//}
+
+void AAIController_CloseCombat::TryApplyDamage()
 {
-	M_Blackboard->SetValueAsBool(FName("IsPerception"), flag);
+	AAICharacter_Base* PossessAI = Cast<AAICharacter_Base>(GetPawn());
+
+	if (PossessAI && M_LockedEnemy && !M_LockedEnemy->IsDead())
+	{
+		float dis = FVector::Distance(PossessAI->GetActorLocation(), M_LockedEnemy->GetActorLocation());
+		if (dis <= PossessAI->AttackRadius)
+		{
+			UGameplayStatics::ApplyDamage(M_LockedEnemy, PossessAI->Atk, this, PossessAI, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
+		
+			GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is TryApplyDamage() succeed !!!（CloseCombat）");
+		}
+	}
 }
