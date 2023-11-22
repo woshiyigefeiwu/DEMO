@@ -22,27 +22,47 @@ public:
 
 	void BeginPlay() override;
 
-	UFUNCTION()
-	AAICharacter_Base* SelectTarget(EEnemySelectRule SelectRule, TArray<AAICharacter_Base*> AI_Array);
-
-	// 找第一个发现的敌人
-	virtual AAICharacter_Base* SelectTarget_First(TArray<AAICharacter_Base*> AI_Array);
-
-	// 找距离最近的敌人
-	virtual AAICharacter_Base* SelectTarget_Nearest(TArray<AAICharacter_Base*> AI_Array);
-
+// ---------------------------------- Init，Get，Set，Check 函数 --------------------------------------
+public:
+	// 获取黑板
 	UFUNCTION()
 	UBlackboardComponent* GetBlackboard();
 
-	// AI 死后的处理（包括数据什么的）
-	virtual void PossessAIDead();
-
-	// AI 攻击过后的处理
-	virtual void FinishAttack();
-
-	// 清空定时器
+	// 初始化一些黑板值
 	UFUNCTION()
-	void ClearTimerHandle();
+	virtual void InitBlackboardValue();
+
+	// 获取攻击范围状态
+	UFUNCTION(BlueprintCallable)
+	bool Get_IsInAttackRange();
+
+	// 设置攻击范围状态
+	UFUNCTION()
+	void Set_IsInAttackRange(bool State);
+
+// -------------------------------------------- 辅助函数 -----------------------------------
+public:
+	// 运行 行为树
+	UFUNCTION()
+	void RunAIBehaviorTree(APawn* InPawn);
+
+	// 绑一些AI身上的委托
+	UFUNCTION()
+	void BindDelegateFromAI(APawn* InPawn);
+
+	// 更新黑板值 IsPerception
+	UFUNCTION()
+	void UpdateBBV_IsInAttackRange();
+
+	// 更新黑板值 Target
+	UFUNCTION()
+	void UpdateBBV_Target();
+
+// -------------------------------------------- Event ------------------------------------
+public:
+	// AI 找完 Target 之后的事件
+	UFUNCTION()
+	void FinishFindTarget();
 
 protected:
 	UPROPERTY()
@@ -51,6 +71,8 @@ protected:
 	UPROPERTY()
 	class UBlackboardComponent* M_Blackboard;
 
-	UPROPERTY()
-	FTimerHandle M_TimerHandle;
+// ------------------------------------------- Blackboard Value -------------------------
+private:
+	// 敌人是否在攻击范围内
+	bool M_IsInAttackRange;
 };

@@ -16,12 +16,9 @@ void AAIController_Base::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	AAICharacter_Base* AI = Cast<AAICharacter_Base>(InPawn);
-	if (AI && AI->GetBTree())
-	{
-		M_Blackboard->InitializeBlackboard(*AI->GetBTree()->BlackboardAsset);		// 初始化AI中的黑板，黑板是在行为树中的。
-		M_BehaviorTree->StartTree(*AI->GetBTree());								//开始运行行为树
-	}
+	BindDelegateFromAI(InPawn);
+
+	RunAIBehaviorTree(InPawn);
 }
 
 void AAIController_Base::BeginPlay()
@@ -29,83 +26,70 @@ void AAIController_Base::BeginPlay()
 	Super::BeginPlay();
 }
 
-AAICharacter_Base* AAIController_Base::SelectTarget(EEnemySelectRule SelectRule, TArray<AAICharacter_Base*> AI_Array)
-{
-	if (SelectRule == EEnemySelectRule::FIRST || SelectRule == EEnemySelectRule::NONE)
-	{
-		return this->SelectTarget_First(AI_Array);
-	}
-	else if (SelectRule == EEnemySelectRule::NEAREST)
-	{
-		return this->SelectTarget_Nearest(AI_Array);
-	}
-
-	return nullptr;
-}
-
-// 找第一个发现的敌人（合法的）
-AAICharacter_Base* AAIController_Base::SelectTarget_First(TArray<AAICharacter_Base*> AI_Array)
-{
-	AAICharacter_Base* Target = nullptr;
-
-	while (AI_Array.Num() && (AI_Array[0] == nullptr || AI_Array[0]->IsDead()))
-	{
-		AI_Array.RemoveAt(0);
-	}
-
-	if (AI_Array.Num())
-	{
-		Target = AI_Array[0];
-		AI_Array.RemoveAt(0);
-	}
-	return Target;
-}
-
-// 找距离最近的敌人
-AAICharacter_Base* AAIController_Base::SelectTarget_Nearest(TArray<AAICharacter_Base*> AI_Array)
-{
-	// 这里得处理一下
-
-	// 找一下所有的敌人的指针 -> 获取位置 -> 算一下到 this 的距离，然后存在另一个数组里（dis，AIi），然后排序，然后取出来，在原数组中删除。
-
-	return nullptr;
-}
+// ---------------------------------- Init，Get，Set，Check 函数 --------------------------------------
 
 UBlackboardComponent* AAIController_Base::GetBlackboard()
 {
 	return M_Blackboard;
 }
 
-// 主要做一些数据的处理
-void AAIController_Base::PossessAIDead()
+void AAIController_Base::InitBlackboardValue()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is PossessAIDead(), DataUpdate");
+	M_IsInAttackRange = false;
+}
 
+bool AAIController_Base::Get_IsInAttackRange()
+{
+	return M_IsInAttackRange;
+}
+
+void AAIController_Base::Set_IsInAttackRange(bool State)
+{
+	M_IsInAttackRange = State;
+}
+
+// -------------------------------------------- 辅助函数 -----------------------------------
+
+void AAIController_Base::RunAIBehaviorTree(APawn* InPawn)
+{
+	AAICharacter_Base* AI = Cast<AAICharacter_Base>(InPawn);
+	if (AI && AI->GetBTree())
+	{
+		M_Blackboard->InitializeBlackboard(*AI->GetBTree()->BlackboardAsset);		// 初始化AI中的黑板，黑板是在行为树中的。
+		M_BehaviorTree->StartTree(*AI->GetBTree());									// 开始运行行为树
+	}
+}
+
+void AAIController_Base::BindDelegateFromAI(APawn* InPawn)
+{
+	AAICharacter_Base* AI = Cast<AAICharacter_Base>(InPawn);
+	if (AI)
+	{
+		AI->OnFindTargetFinish.AddDynamic(this, &AAIController_Base::FinishFindTarget);
+	}
+}
+
+void AAIController_Base::UpdateBBV_IsInAttackRange()
+{
+	M_Blackboard->SetValueAsBool("IsInAttackRange", M_IsInAttackRange);
+}
+
+void AAIController_Base::UpdateBBV_Target()
+{
 	AAICharacter_Base* AI = Cast<AAICharacter_Base>(GetPawn());
-	AMyGameStateBase* GS = Cast<AMyGameStateBase>(GetWorld()->GetGameState());
-	
-	if (GS)
+	if (AI)
 	{
-		GS->DeleteAI(AI);
+		M_Blackboard->SetValueAsObject(FName("Target"), AI->GetTargetEnemy());
 	}
 }
 
-// AI 完成攻击之后的善后处理
-void AAIController_Base::FinishAttack()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Yellow, "this is AAIController_CloseCombat::FinishAttack()");
+// --------------------------------------------- Event ---------------------------------------
 
-	AAICharacter_Base* PossessAI = Cast<AAICharacter_Base>(GetPawn());
-	if (PossessAI)
-	{
-		GetWorldTimerManager().SetTimer(M_TimerHandle, this, &AAIController_Base::ClearTimerHandle, PossessAI->AtkCD, false);
-	}
-}
+// AI 找到 Target 之后，更新一下黑板键值
+void AAIController_Base::FinishFindTarget()
+{	
+	UpdateBBV_Target();
 
-// 清空定时器
-void AAIController_Base::ClearTimerHandle()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Yellow, "this is AAIController_CloseCombat::ClearTimerHandle()");
-
-	GetWorldTimerManager().ClearTimer(M_TimerHandle);
+	// 重置 IsPerception，以便 AI 可以巡逻
+	M_Blackboard->SetValueAsBool("IsPerception", false);
 }

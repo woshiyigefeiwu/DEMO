@@ -22,8 +22,8 @@ void AMyGameMode::BeginPlay()
 	//CreateGeneralConfig();
 }
 
-void AMyGameMode::CreateGeneralConfig()
-{
+//void AMyGameMode::CreateGeneralConfig()
+//{
 	//FString GeneralConfigPath = FString(TEXT("Blueprint'/Game/Demo/BluePrints/Manager/BP_GeneralConfig.BP_GeneralConfig_C'"));	// ◊¢“‚ «¿∂Õº¿‡
 	//UClass* GeneralConfigClass = LoadClass<AGeneralConfig>(NULL, *GeneralConfigPath);
 	//M_GeneralConfig = GetWorld()->SpawnActor<AGeneralConfig>(GeneralConfigClass);
@@ -33,9 +33,9 @@ void AMyGameMode::CreateGeneralConfig()
 	//{
 	//	GS->Init(M_GeneralConfig);
 	//}
-}
+//}
 
-AGeneralConfig* AMyGameMode::GetGeneralConfig()
-{
-	return M_GeneralConfig;
-}
+//AGeneralConfig* AMyGameMode::GetGeneralConfig()
+//{
+//	return M_GeneralConfig;
+//}

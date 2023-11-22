@@ -1,16 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "MyGameStateBase.h"
 #include "GeneralDataAsset.h"
 #include "Kismet/GameplayStatics.h"
 #include "MyPlayerController.h"
-
-#include "MyGameStateBase.h"
 #include "MyGameModeBase.h"
+#include "Engine/World.h"
 
 void AMyGameStateBase::BeginPlay()
 {
 	// 初始化一下GameState
 	Init();
+
+	// 创建 UIM
+	CreateUIManager();
+	if (M_UIManager)
+	{
+		M_UIManager->Init();
+	}
 }
 
 void AMyGameStateBase::Init()
@@ -172,3 +179,15 @@ void AMyGameStateBase::DeleteAI(AAICharacter_Base* AI)
 		GameOverDelegate.Broadcast();
 	}
 }
+
+AUIManager* AMyGameStateBase::GetUIManager()
+{
+	return M_UIManager;
+}
+
+void AMyGameStateBase::CreateUIManager()
+{
+	M_UIManager = GWorld->SpawnActor<AUIManager>();
+}
+
+

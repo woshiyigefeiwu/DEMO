@@ -28,10 +28,16 @@ function WBP_Camps:OnClickedCampButton()
     local GS = UE.UGameplayStatics.GetGameState(self);
     GS:SetCurrentCamp(self.CampType);
 
-    local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
-    local MyPC = MyPawn:GetController();
-    if(MyPC) then
-        MyPC:OnClick_SelectButton();
+    -- local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
+    -- local MyPC = MyPawn:GetController();
+    -- if(MyPC) then
+    --     MyPC:OnClick_SelectButton();
+    -- end
+
+    local GS = UE.UGameplayStatics.GetGameState(self);
+    if(GS and GS:GetUIManager()) then
+        local UIM = GS:GetUIManager();
+        UIM:ShowUI("UI_PlaceAI");
     end
 end
 

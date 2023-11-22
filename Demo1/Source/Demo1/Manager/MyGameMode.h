@@ -21,13 +21,13 @@ public:
 
 	UFUNCTION()
 	void BeginPlay() override;
-	
-	UFUNCTION()
-	void CreateGeneralConfig();
 
-	UFUNCTION()
-	AGeneralConfig* GetGeneralConfig();
+	//UFUNCTION()
+	//void CreateGeneralConfig();
 
-private:
-	AGeneralConfig* M_GeneralConfig = nullptr;
+	//UFUNCTION()
+	//AGeneralConfig* GetGeneralConfig();
+
+//private:
+	//AGeneralConfig* M_GeneralConfig = nullptr;
 };

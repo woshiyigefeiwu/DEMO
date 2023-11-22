@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GeneralDataAsset.h"
+#include "UIManager.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
@@ -28,7 +29,4 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataAssets")
 	UGeneralDataAsset* GeneralDataAsset = nullptr;
-
-//private:
-	//AGeneralConfig* M_GeneralConfig = nullptr;
 };

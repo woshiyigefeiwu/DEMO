@@ -34,21 +34,3 @@ UGeneralDataAsset* AMyGameModeBase::GetGeneralDataAsset()
 {
 	return GeneralDataAsset;
 }
-
-//void AMyGameModeBase::CreateGeneralConfig()
-//{
-	//FString GeneralConfigPath = FString(TEXT("Blueprint'/Game/Demo/BluePrints/Manager/BP_GeneralConfig.BP_GeneralConfig_C'"));	// ◊¢“‚ «¿∂Õº¿‡
-	//UClass* GeneralConfigClass = LoadClass<AGeneralConfig>(NULL, *GeneralConfigPath);
-	//M_GeneralConfig = GetWorld()->SpawnActor<AGeneralConfig>(GeneralConfigClass);
-
-	//AMyGameStateBase* GS = GetGameState<AMyGameStateBase>();
-	//if (GS)
-	//{
-	//	GS->Init(M_GeneralConfig);
-	//}
-//}
-
-//AGeneralConfig* AMyGameModeBase::GetGeneralConfig()
-//{
-//	return M_GeneralConfig;
-//}

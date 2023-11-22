@@ -19,9 +19,9 @@ function WBP_GameStart:Bind()
     self.PlaceStageButton.OnClicked:Add(self, self.OnClickedPlace);
     self.StartStageButton.OnClicked:Add(self, self.OnClickedStart);
 
-    local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
-    local MyPC = MyPawn:GetController();
-    print("WBP_GameStart:Bind()");
+    -- local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
+    -- local MyPC = MyPawn:GetController();
+    -- print("WBP_GameStart:Bind()");
     self:PauseGame();   -- ¿∂Õº£¨‘›Õ£”Œœ∑
 end
 
@@ -29,19 +29,31 @@ end
 
 function WBP_GameStart:OnClickedPlace()
     -- print("OnClickedPlace")
-    local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
-    local MyPC = MyPawn:GetController();
-    if(MyPC) then
-        MyPC:OnClick_PlaceButton();
+    -- local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
+    -- local MyPC = MyPawn:GetController();
+    -- if(MyPC) then
+    --     MyPC:OnClick_PlaceButton();
+    -- end
+
+    local GS = UE.UGameplayStatics.GetGameState(self);
+    if(GS and GS:GetUIManager()) then
+        local UIM = GS:GetUIManager();
+        UIM:ShowUI("UI_SelectCamp");
     end
 end
 
 function WBP_GameStart:OnClickedStart()
     self:ReleaseGame();
-    local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
-    local MyPC = MyPawn:GetController();
-    if(MyPC) then
-        MyPC:OnClick_GameStart();
+    -- local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
+    -- local MyPC = MyPawn:GetController();
+    -- if(MyPC) then
+    --     MyPC:OnClick_GameStart();
+    -- end
+
+    local GS = UE.UGameplayStatics.GetGameState(self);
+    if(GS and GS:GetUIManager()) then
+        local UIM = GS:GetUIManager();
+        UIM:ShowUI("UI_GamePlay");
     end
 end
 

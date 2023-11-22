@@ -57,25 +57,6 @@ struct FCampInfo
 	FSoftObjectPath CampImage;		
 };
 
-//USTRUCT(BlueprintType)
-//struct FSoldierInfo
-//{
-//	GENERATED_BODY()
-//
-//	// 士兵的类型
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-//	ESoldierType Type;					
-//
-//	// 士兵的蓝图类
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-//	FSoftClassPath SoldierClass;		
-//
-//	// 士兵的图片显示
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-//	FSoftObjectPath SoldierImage;
-//};
-
-
 /**
  * 
  */
@@ -88,29 +69,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FCampInfo> CampInfoList;
 
-	//UPROPERTY(EditAnywhere)
-	//TArray<FSoldierInfo> SoldierInfoList;
-
 	UPROPERTY(EditAnywhere)
 	TArray<FSoftClassPath> SoldierInfoList;
 
-	// 游戏开始界面
-	UPROPERTY(EditAnywhere)
-	FSoftClassPath WBP_GameStart;
+	// UI 总配置，UI 唯一id，对应UI路径
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "UIConfig"))
+	TMap<FString, FSoftClassPath> UIMap;
 
-	// 选择阵营界面
-	UPROPERTY(EditAnywhere)
-	FSoftClassPath WBP_SelectCamp;
-
-	// 放置界面
-	UPROPERTY(EditAnywhere)
-	FSoftClassPath WBP_PlaceAI;
-
-	// 游戏进行时界面
-	UPROPERTY(EditAnywhere)
-	FSoftClassPath WBP_GamePlay;
-
-	// 游戏结束界面
-	UPROPERTY(EditAnywhere)
-	FSoftClassPath WBP_GameOver;
+	// 默认打开的UI
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "UIConfig"))
+	FString DefaultUI;
 };

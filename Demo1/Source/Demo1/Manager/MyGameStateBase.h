@@ -4,6 +4,7 @@
 
 #include "GeneralDataAsset.h"
 #include "Demo1/AICharacter/AICharacter_Base.h"
+#include "UIManager.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
@@ -70,9 +71,17 @@ public:
 	UFUNCTION()
 	void DeleteAI(AAICharacter_Base* AI);
 
+	UFUNCTION(BlueprintCallable)
+	AUIManager* GetUIManager();
+
+	UFUNCTION()
+	void CreateUIManager();
+
+
 public:
 	UPROPERTY()
 	FGameOverDelegate GameOverDelegate;
+
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -87,9 +96,8 @@ private:
 
 	// 存游戏里面的所有数据（每个阵营，的每个兵种，的 AI 以及数量）
 	UPROPERTY()
-	TMap<ECampType, FCamp_AIList> M_AIList;
+	TMap<ECampType, FCamp_AIList> M_AIList;	
+
+	UPROPERTY()
+	AUIManager* M_UIManager = nullptr;
 };
-
-
-//UPROPERTY(EditAnywhere)
-//TArray<FSoldierInfo> M_SoldierInfoList;
