@@ -111,5 +111,5 @@ void AUIManager::OnGameOver()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, FString::Printf(TEXT("this is OnGameOver()")));
 
-	ShowUI("UI_GameOver");
+	//ShowUI("UI_GameOver");
 }

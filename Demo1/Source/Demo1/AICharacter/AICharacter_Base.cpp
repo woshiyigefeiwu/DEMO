@@ -63,19 +63,24 @@ float AAICharacter_Base::SetCurrentHP(float NewHP)
 	return M_CurrentHP;
 }
 
-AAICharacter_Base* AAICharacter_Base::GetTargetEnemy()
-{
-	return M_TargetEnemy;
-}
+//AAICharacter_Base* AAICharacter_Base::GetTargetEnemy()
+//{
+//	return M_TargetEnemy;
+//}
+//
+//void AAICharacter_Base::SetTargetEnemy(AAICharacter_Base* NewEnemy)
+//{
+//	M_TargetEnemy = NewEnemy;
+//}
+//
+//TArray<AAICharacter_Base*> AAICharacter_Base::GetEnemyArray()
+//{
+//	return EnemyArray;
+//}
 
-void AAICharacter_Base::SetTargetEnemy(AAICharacter_Base* NewEnemy)
+float AAICharacter_Base::GetAtk()
 {
-	M_TargetEnemy = NewEnemy;
-}
-
-TArray<AAICharacter_Base*> AAICharacter_Base::GetEnemyArray()
-{
-	return EnemyArray;
+	return Atk;
 }
 
 bool AAICharacter_Base::IsInAttackCD()
@@ -138,9 +143,11 @@ void AAICharacter_Base::ClearTimerHandle()
 
 float AAICharacter_Base::GetDistanceFromEnemy()
 {
-	if (M_TargetEnemy)
+	AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
+	AAICharacter_Base* TargetEnemy = AIC->GetTargetEnemy();
+	if (TargetEnemy)
 	{
-		return FVector::Distance(this->GetActorLocation(), M_TargetEnemy->GetActorLocation());
+		return FVector::Distance(this->GetActorLocation(), TargetEnemy->GetActorLocation());
 	}
 	else
 	{
@@ -149,39 +156,39 @@ float AAICharacter_Base::GetDistanceFromEnemy()
 	}
 }
 
-AAICharacter_Base* AAICharacter_Base::SelectTarget()
-{
-	if (EnemySelectRule == EEnemySelectRule::NONE || EnemySelectRule == EEnemySelectRule::FIRST)
-	{
-		return SelectTarget_First();
-	}
-	else if (EnemySelectRule == EEnemySelectRule::NEAREST)
-	{
-		return SelectTarget_Nearest();
-	}
+//AAICharacter_Base* AAICharacter_Base::SelectTarget()
+//{
+//	if (EnemySelectRule == EEnemySelectRule::NONE || EnemySelectRule == EEnemySelectRule::FIRST)
+//	{
+//		return SelectTarget_First();
+//	}
+//	else if (EnemySelectRule == EEnemySelectRule::NEAREST)
+//	{
+//		return SelectTarget_Nearest();
+//	}
+//
+//	return nullptr;
+//}
+//
+//AAICharacter_Base* AAICharacter_Base::SelectTarget_First()
+//{
+//	AAICharacter_Base* Target = nullptr;
+//
+//	while (EnemyArray.Num() && (EnemyArray[0] == nullptr || EnemyArray[0]->IsDead()))
+//	{
+//		EnemyArray.RemoveAt(0);
+//	}
+//
+//	if (EnemyArray.Num())
+//	{
+//		Target = EnemyArray[0];
+//		EnemyArray.RemoveAt(0);
+//	}
+//	return Target;
+//}
 
-	return nullptr;
-}
-
-AAICharacter_Base* AAICharacter_Base::SelectTarget_First()
-{
-	AAICharacter_Base* Target = nullptr;
-
-	while (EnemyArray.Num() && (EnemyArray[0] == nullptr || EnemyArray[0]->IsDead()))
-	{
-		EnemyArray.RemoveAt(0);
-	}
-
-	if (EnemyArray.Num())
-	{
-		Target = EnemyArray[0];
-		EnemyArray.RemoveAt(0);
-	}
-	return Target;
-}
-
-AAICharacter_Base* AAICharacter_Base::SelectTarget_Nearest()
-{
+//AAICharacter_Base* AAICharacter_Base::SelectTarget_Nearest()
+//{
 	//USTRUCT(BlueprintType)
 	//struct FTempStruct
 	//{
@@ -225,34 +232,43 @@ AAICharacter_Base* AAICharacter_Base::SelectTarget_Nearest()
 
 	//return TargetEnemy;
 
-	return nullptr;
-}
+	//return nullptr;
+//}
 
 // ---------------------------------------- AI Behavior 接口（BT 调用） ------------------------------------------------
 
-void AAICharacter_Base::AttackEnemy()
+void AAICharacter_Base::AttackEnemy(AAICharacter_Base* Enemy)
 {
 }
 
 void AAICharacter_Base::FindTarget()
 {
-	// 有目标且目标未死亡
-	if (M_TargetEnemy && !M_TargetEnemy->IsDead())
-	{
-		return;
-	}
+	//// 有目标且目标未死亡
+	//if (M_TargetEnemy && !M_TargetEnemy->IsDead())
+	//{
+	//	return;
+	//}
 
-	M_TargetEnemy = SelectTarget();
+	//M_TargetEnemy = SelectTarget();
 
 	// 抛一个事件出去，AIC 接到之后，修改黑板值。
-	OnFindTargetFinish.Broadcast();
+	//OnFindTargetFinish.Broadcast();
+
+	// -------------------- 重写 --------------------------
+
+	AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
+	AIC->FindTarget();
+	//if (AIC && AIC->CheckTargetEnemy())
+	//{
+
+	//}
 }
 
-void AAICharacter_Base::AI_ApplyDamage()
+void AAICharacter_Base::AI_ApplyDamage(AAICharacter_Base* Enemy)
 {
-	if (M_TargetEnemy && GetDistanceFromEnemy() <= AttackRadius)
+	if (Enemy && GetDistanceFromEnemy() <= AttackRadius)
 	{
-		UGameplayStatics::ApplyDamage(M_TargetEnemy, Atk, GetController(), this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
+		UGameplayStatics::ApplyDamage(Enemy, Atk, GetController(), this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
 		GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is TryApplyDamage() succeed !!!（CloseCombat）");
 	}
 }

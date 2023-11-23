@@ -48,6 +48,21 @@ void AAIController_Base::Set_IsInAttackRange(bool State)
 	M_IsInAttackRange = State;
 }
 
+AAICharacter_Base* AAIController_Base::GetTargetEnemy()
+{
+	return M_TargetEnemy;
+}
+
+void AAIController_Base::SetTargetEnemy(AAICharacter_Base* NewEnemy)
+{
+	M_TargetEnemy = NewEnemy;
+}
+
+TArray<AAICharacter_Base*> AAIController_Base::GetEnemyArray()
+{
+	return M_EnemyArray;
+}
+
 // -------------------------------------------- ¸¨Öúº¯Êý -----------------------------------
 
 void AAIController_Base::RunAIBehaviorTree(APawn* InPawn)
@@ -79,8 +94,47 @@ void AAIController_Base::UpdateBBV_Target()
 	AAICharacter_Base* AI = Cast<AAICharacter_Base>(GetPawn());
 	if (AI)
 	{
-		M_Blackboard->SetValueAsObject(FName("Target"), AI->GetTargetEnemy());
+		M_Blackboard->SetValueAsObject(FName("Target"), M_TargetEnemy);
 	}
+}
+
+AAICharacter_Base* AAIController_Base::SelectTarget()
+{
+	AAICharacter_Base* AI = Cast<AAICharacter_Base>(GetPawn());
+	EEnemySelectRule EnemySelectRule = AI->EnemySelectRule;
+
+	if (EnemySelectRule == EEnemySelectRule::NONE || EnemySelectRule == EEnemySelectRule::FIRST)
+	{
+		return SelectTarget_First();
+	}
+	else if (EnemySelectRule == EEnemySelectRule::NEAREST)
+	{
+		return SelectTarget_Nearest();
+	}
+
+	return nullptr;
+}
+
+AAICharacter_Base* AAIController_Base::SelectTarget_First()
+{
+	AAICharacter_Base* Target = nullptr;
+
+	while (M_EnemyArray.Num() && (M_EnemyArray[0] == nullptr || M_EnemyArray[0]->IsDead()))
+	{
+		M_EnemyArray.RemoveAt(0);
+	}
+
+	if (M_EnemyArray.Num())
+	{
+		Target = M_EnemyArray[0];
+		M_EnemyArray.RemoveAt(0);
+	}
+	return Target;
+}
+
+AAICharacter_Base* AAIController_Base::SelectTarget_Nearest()
+{
+	return nullptr;
 }
 
 // --------------------------------------------- Event ---------------------------------------

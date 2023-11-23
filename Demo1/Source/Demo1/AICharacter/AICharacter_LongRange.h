@@ -19,16 +19,14 @@ public:
 	void BeginPlay() override;
 
 	// 发起攻击
-	//UFUNCTION()
-	//void AttackEnemy();
+	void AttackEnemy(AAICharacter_Base* Enemy) override;
 
-	// 受到攻击（从APawn覆盖）
-	//float TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	// 开火
+	UFUNCTION()
+	void StartFire();
 
-	// 死亡接口
-	//UFUNCTION()
-	//void Death();
-
-//public:
-
+public:
+	// 发射物
+	UPROPERTY(EditAnywhere, Category = "SpecialConfig")
+	FSoftClassPath ProjectileClass;
 };

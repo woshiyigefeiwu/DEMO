@@ -57,13 +57,20 @@ public:
 	float SetCurrentHP(float NewHP);
 
 	// 获取当前 AI 的目标敌人
-	AAICharacter_Base* GetTargetEnemy();
+	//UFUNCTION()
+	//AAICharacter_Base* GetTargetEnemy();
 
 	// 设置当前 AI 的目标敌人
-	void SetTargetEnemy(AAICharacter_Base* NewEnemy);
+	//UFUNCTION()
+	//void SetTargetEnemy(AAICharacter_Base* NewEnemy);
 
 	// 获取 Enemy 数组
-	TArray<AAICharacter_Base*> GetEnemyArray();
+	//UFUNCTION()
+	//TArray<AAICharacter_Base*> GetEnemyArray();
+
+	// 获取攻击力
+	UFUNCTION()
+	float GetAtk();
 
 // ------------------------------------------- 辅助函数 -----------------------------------
 public:
@@ -75,15 +82,15 @@ public:
 	UFUNCTION()
 	float TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	// 选敌（根据选敌规则调用不同的选敌方式）
-	UFUNCTION()
-	AAICharacter_Base* SelectTarget();
+	//// 选敌（根据选敌规则调用不同的选敌方式）
+	//UFUNCTION()
+	//AAICharacter_Base* SelectTarget();
 
-	// 找第一个发现的敌人（派生类可自己重写）
-	virtual AAICharacter_Base* SelectTarget_First();
+	//// 找第一个发现的敌人（派生类可自己重写）
+	//virtual AAICharacter_Base* SelectTarget_First();
 
-	// 找距离最近的敌人（派生类可自己重写）
-	virtual AAICharacter_Base* SelectTarget_Nearest();
+	//// 找距离最近的敌人（派生类可自己重写）
+	//virtual AAICharacter_Base* SelectTarget_Nearest();
 
 	// AI 死亡后的处理
 	UFUNCTION()
@@ -105,7 +112,7 @@ public:
 public:
 	// 发起攻击（派生类重写一下）
 	UFUNCTION(BlueprintCallable, Category = "Base_AI_Behavior")
-	virtual void AttackEnemy();
+	virtual void AttackEnemy(AAICharacter_Base* Enemy);
 
 	// 寻找敌人
 	UFUNCTION(BlueprintCallable, Category = "Base_AI_Behavior")
@@ -117,7 +124,7 @@ public:
 
 	// 施加伤害
 	UFUNCTION(BlueprintCallable)
-	void AI_ApplyDamage();
+	void AI_ApplyDamage(AAICharacter_Base* Enemy);
 
 // ----------------------------------------- AI 的基础属性 --------------------------------------------
 public:
@@ -195,16 +202,16 @@ private:
 	FTimerHandle M_TimerHandle;
 
 	// 当前 AI 的 目标敌人（同步黑板键值）
-	UPROPERTY()
-	AAICharacter_Base* M_TargetEnemy = nullptr;
+	//UPROPERTY()
+	//AAICharacter_Base* M_TargetEnemy = nullptr;
 
 	// 当前 AI 是否处于攻击状态（同步黑板键值）
 	bool M_IsAttack;
 
 public:
 	// 检测到的敌人
-	UPROPERTY()
-	TArray<AAICharacter_Base*> EnemyArray;
+	//UPROPERTY()
+	//TArray<AAICharacter_Base*> EnemyArray;
 
 // ---------------------------------------- Delegate --------------------------------------
 public:

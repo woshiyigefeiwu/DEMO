@@ -18,17 +18,5 @@ public:
 	void BeginPlay() override;
 
 	// 发起攻击
-	//UFUNCTION(BlueprintCallable, Category = "Base_AI_Behavior")
-	void AttackEnemy() override;
-
-	// 受到攻击（从APawn覆盖）
-	//UFUNCTION()
-	//float TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
-	// 死亡接口
-	//UFUNCTION()
-	//void Death();
-
-public:
-
+	void AttackEnemy(AAICharacter_Base* Enemy) override;
 };

@@ -40,6 +40,18 @@ public:
 	UFUNCTION()
 	void Set_IsInAttackRange(bool State);
 
+	// 获取当前 AI 的目标敌人
+	UFUNCTION(BlueprintCallable)
+	AAICharacter_Base* GetTargetEnemy();
+
+	// 设置当前 AI 的目标敌人
+	UFUNCTION()
+	void SetTargetEnemy(AAICharacter_Base* NewEnemy);
+
+	// 获取 Enemy 数组
+	UFUNCTION()
+	TArray<AAICharacter_Base*> GetEnemyArray();
+
 // -------------------------------------------- 辅助函数 -----------------------------------
 public:
 	// 运行 行为树
@@ -58,6 +70,20 @@ public:
 	UFUNCTION()
 	void UpdateBBV_Target();
 
+	// 找 Target（因为查找方式可能不同，派生类重写）
+	UFUNCTION()
+	virtual void FindTarget() {};
+
+	// 选敌（根据选敌规则调用不同的选敌方式）
+	UFUNCTION()
+	AAICharacter_Base* SelectTarget();
+
+	// 找第一个发现的敌人（派生类可自己重写）
+	virtual AAICharacter_Base* SelectTarget_First();
+
+	// 找距离最近的敌人（派生类可自己重写）
+	virtual AAICharacter_Base* SelectTarget_Nearest();
+
 // -------------------------------------------- Event ------------------------------------
 public:
 	// AI 找完 Target 之后的事件
@@ -72,7 +98,16 @@ protected:
 	class UBlackboardComponent* M_Blackboard;
 
 // ------------------------------------------- Blackboard Value -------------------------
-private:
+protected:
 	// 敌人是否在攻击范围内
+	UPROPERTY()
 	bool M_IsInAttackRange;
+
+	// 当前 AI 的 目标敌人（同步黑板键值）
+	UPROPERTY()
+	AAICharacter_Base* M_TargetEnemy = nullptr;
+
+	// 检测到的敌人
+	UPROPERTY()
+	TArray<AAICharacter_Base*> M_EnemyArray;
 };

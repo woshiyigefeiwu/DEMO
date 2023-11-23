@@ -32,27 +32,10 @@ public:
 	UFUNCTION()
 	void UpdateState();
 
-	// 尝试发出攻击
-	//UFUNCTION()
-	//void TryAttack();
-
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
-	//UFUNCTION(BlueprintCallable)
-	//void FindTarget();
-
-	// AI 攻击后的善后处理
-	//UFUNCTION()
-	//void FinishAttack() override;
-
-	// 清空定时器
-	//UFUNCTION()
-	//void ClearTimerHandle();
-
-	// 施加伤害
-	//UFUNCTION(BlueprintCallable)
-	//void TryApplyDamage();
+	void FindTarget() override;
 
 private:
 	UPROPERTY()
@@ -60,15 +43,4 @@ private:
 
 	UPROPERTY()
 	class UAIPerceptionComponent* M_AIPerception = nullptr;
-
-	// 检测到的敌人
-	//UPROPERTY()
-	//TArray<AAICharacter_Base*> M_EnemyArray;
-
-	// 当前 AI 锁定到的 Enemy AI
-	//UPROPERTY()
-	//AAICharacter_Base* M_LockedEnemy = nullptr;
-
-	//UPROPERTY()
-	//FTimerHandle M_TimerHandle;
 };
