@@ -58,10 +58,6 @@ public:
 	UFUNCTION()
 	void RunAIBehaviorTree(APawn* InPawn);
 
-	// 绑一些AI身上的委托
-	UFUNCTION()
-	void BindDelegateFromAI(APawn* InPawn);
-
 	// 更新黑板值 IsPerception
 	UFUNCTION()
 	void UpdateBBV_IsInAttackRange();
@@ -74,6 +70,10 @@ public:
 	UFUNCTION()
 	virtual void FindTarget() {};
 
+	// 求和目标的距离
+	UFUNCTION(BlueprintCallable)
+	float GetDistanceFromEnemy();
+
 	// 选敌（根据选敌规则调用不同的选敌方式）
 	UFUNCTION()
 	AAICharacter_Base* SelectTarget();
@@ -84,12 +84,7 @@ public:
 	// 找距离最近的敌人（派生类可自己重写）
 	virtual AAICharacter_Base* SelectTarget_Nearest();
 
-// -------------------------------------------- Event ------------------------------------
-public:
-	// AI 找完 Target 之后的事件
-	UFUNCTION()
-	void FinishFindTarget();
-
+// -------------------------------------------- AI Data ------------------------------------
 protected:
 	UPROPERTY()
 	class UBehaviorTreeComponent* M_BehaviorTree;
@@ -97,15 +92,15 @@ protected:
 	UPROPERTY()
 	class UBlackboardComponent* M_Blackboard;
 
+	// 当前 AI 的 目标敌人（同步黑板键值）
+	UPROPERTY()
+	AAICharacter_Base* M_TargetEnemy = nullptr;
+
 // ------------------------------------------- Blackboard Value -------------------------
 protected:
 	// 敌人是否在攻击范围内
 	UPROPERTY()
 	bool M_IsInAttackRange;
-
-	// 当前 AI 的 目标敌人（同步黑板键值）
-	UPROPERTY()
-	AAICharacter_Base* M_TargetEnemy = nullptr;
 
 	// 检测到的敌人
 	UPROPERTY()

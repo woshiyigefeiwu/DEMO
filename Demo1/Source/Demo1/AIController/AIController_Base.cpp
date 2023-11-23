@@ -16,8 +16,6 @@ void AAIController_Base::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	BindDelegateFromAI(InPawn);
-
 	RunAIBehaviorTree(InPawn);
 }
 
@@ -75,15 +73,6 @@ void AAIController_Base::RunAIBehaviorTree(APawn* InPawn)
 	}
 }
 
-void AAIController_Base::BindDelegateFromAI(APawn* InPawn)
-{
-	AAICharacter_Base* AI = Cast<AAICharacter_Base>(InPawn);
-	if (AI)
-	{
-		AI->OnFindTargetFinish.AddDynamic(this, &AAIController_Base::FinishFindTarget);
-	}
-}
-
 void AAIController_Base::UpdateBBV_IsInAttackRange()
 {
 	M_Blackboard->SetValueAsBool("IsInAttackRange", M_IsInAttackRange);
@@ -95,6 +84,20 @@ void AAIController_Base::UpdateBBV_Target()
 	if (AI)
 	{
 		M_Blackboard->SetValueAsObject(FName("Target"), M_TargetEnemy);
+	}
+}
+
+float AAIController_Base::GetDistanceFromEnemy()
+{
+	AAICharacter_Base* AI = Cast<AAICharacter_Base>(GetPawn());
+	if (AI && M_TargetEnemy)
+	{
+		return FVector::Distance(AI->GetActorLocation(), M_TargetEnemy->GetActorLocation());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("this is AAICharacter_Base::GetDistanceFromEnemy(), the M_TargetEnemy is null"));
+		return INFINITY;
 	}
 }
 
@@ -134,16 +137,48 @@ AAICharacter_Base* AAIController_Base::SelectTarget_First()
 
 AAICharacter_Base* AAIController_Base::SelectTarget_Nearest()
 {
+	//USTRUCT(BlueprintType)
+	//struct FTempStruct
+	//{
+	//	GENERATED_USTRUCT_BODY()
+
+	//public:
+	//	UPROPERTY()
+	//	AAICharacter_Base* TempEnemy;
+
+	//	UPROPERTY()
+	//	float dis;		// 两者之间的距离
+
+	//	bool operator<(const FTempStruct& TempStructNode) const
+	//	{
+	//		//>是从大到小排序，<就是从小到大
+	//		return dis < TempStructNode.dis;
+	//	}
+	//};
+
+	//TArray<FTempStruct> TempArray;
+	//for (int i = 0; i < EnemyArray.Num(); i++)
+	//{
+	//	if (EnemyArray[i] != nullptr && EnemyArray[i]->IsDead() == false)
+	//	{
+	//		FTempStruct TempStructNode;
+	//		TempStructNode.TempEnemy = EnemyArray[i];
+	//		TempStructNode.dis = FVector::Distance(this->GetActorLocation(), EnemyArray[i]->GetActorLocation());
+	//		TempArray.Add(TempStructNode);
+	//	}
+	//}
+	//TempArray.Sort();
+
+	//AAICharacter_Base* TargetEnemy = nullptr;
+	//if (TempArray.Num())
+	//{
+	//	TargetEnemy = TempArray[0].TempEnemy;
+
+	//	// 从原数组中删除
+	//	EnemyArray.Remove(TargetEnemy);
+	//}
+
+	//return TargetEnemy;
+
 	return nullptr;
-}
-
-// --------------------------------------------- Event ---------------------------------------
-
-// AI 找到 Target 之后，更新一下黑板键值
-void AAIController_Base::FinishFindTarget()
-{	
-	UpdateBBV_Target();
-
-	// 重置 IsPerception，以便 AI 可以巡逻
-	M_Blackboard->SetValueAsBool("IsPerception", false);
 }

@@ -9,8 +9,9 @@
 #include "Demo1/Demo1Character.h"
 #include "AICharacter_Base.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAfterPossessed);		// AIC possess 之后播一次，初始化一下（UI 之类的）
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLaunchAttack);		// 发起攻击
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFindTargetFinish);	// 找完 Target 之后
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTakeDamage);			// 受到伤害（刷一下 UI 等等）
 
 UCLASS()
 class DEMO1_API AAICharacter_Base : public ADemo1Character
@@ -22,15 +23,25 @@ public:
 
 	void Tick(float DeltaSeconds) override;
 
+	void BeginPlay() override;
+
 // ----------------------------------------- Init，Get，Set，Check 函数 ----------------------------------------------
 public:
 	// 初始化一些 AI 的属性
 	UFUNCTION()
 	virtual void Init();
 
+	// AIC OnPossess 之后的操作
+	UFUNCTION()
+	virtual void AfterOnPossessed();
+
 	// 获取当前 AI 的阵营类型
 	UFUNCTION()
 	ECampType GetCampType();
+
+	// 获取当前阵营对应的颜色
+	UFUNCTION(BlueprintCallable)
+	FColor GetColorByCampType();
 
 	// 设置 AI 的阵营类型
 	UFUNCTION()
@@ -52,25 +63,21 @@ public:
 	UFUNCTION()
 	bool IsDead();
 
-	// 设置一下当前 HP
-	UFUNCTION()
-	float SetCurrentHP(float NewHP);
-
-	// 获取当前 AI 的目标敌人
-	//UFUNCTION()
-	//AAICharacter_Base* GetTargetEnemy();
-
-	// 设置当前 AI 的目标敌人
-	//UFUNCTION()
-	//void SetTargetEnemy(AAICharacter_Base* NewEnemy);
-
-	// 获取 Enemy 数组
-	//UFUNCTION()
-	//TArray<AAICharacter_Base*> GetEnemyArray();
-
 	// 获取攻击力
 	UFUNCTION()
 	float GetAtk();
+
+	// 获取最大生命值
+	UFUNCTION(BlueprintCallable)
+	float GetMaxHp() { return MaxHP; }
+
+	// 获取当前生命值
+	UFUNCTION(BlueprintCallable)
+	float GetCurrentHp() { return M_CurrentHP; }
+
+	// 设置一下当前 HP
+	UFUNCTION()
+	float SetCurrentHP(float NewHP);
 
 // ------------------------------------------- 辅助函数 -----------------------------------
 public:
@@ -81,16 +88,6 @@ public:
 	// 受到攻击（从APawn覆盖）
 	UFUNCTION()
 	float TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
-	//// 选敌（根据选敌规则调用不同的选敌方式）
-	//UFUNCTION()
-	//AAICharacter_Base* SelectTarget();
-
-	//// 找第一个发现的敌人（派生类可自己重写）
-	//virtual AAICharacter_Base* SelectTarget_First();
-
-	//// 找距离最近的敌人（派生类可自己重写）
-	//virtual AAICharacter_Base* SelectTarget_Nearest();
 
 	// AI 死亡后的处理
 	UFUNCTION()
@@ -103,10 +100,6 @@ public:
 	// 是否正在CD中
 	UFUNCTION(BlueprintCallable)
 	bool IsInAttackCD();
-
-	// 求和目标的距离
-	UFUNCTION(BlueprintCallable)
-	float GetDistanceFromEnemy();
 
 // ---------------------------------------- AI Behavior 接口（BT 调用） ------------------------------------------------
 public:
@@ -201,25 +194,20 @@ private:
 	UPROPERTY()
 	FTimerHandle M_TimerHandle;
 
-	// 当前 AI 的 目标敌人（同步黑板键值）
-	//UPROPERTY()
-	//AAICharacter_Base* M_TargetEnemy = nullptr;
-
 	// 当前 AI 是否处于攻击状态（同步黑板键值）
 	bool M_IsAttack;
 
-public:
-	// 检测到的敌人
-	//UPROPERTY()
-	//TArray<AAICharacter_Base*> EnemyArray;
-
 // ---------------------------------------- Delegate --------------------------------------
 public:
-	// 寻找完目标之后，抛个事件
-	UPROPERTY()
-	FOnFindTargetFinish OnFindTargetFinish;
+	// 做一些初始化操作
+	UPROPERTY(BlueprintAssignable)
+	FOnAfterPossessed OnAfterPossessed;
 
 	// 发起攻击
 	UPROPERTY(BlueprintAssignable)
 	FOnLaunchAttack OnLaunchAttack;
+
+	// 受到攻击
+	UPROPERTY(BlueprintAssignable)
+	FOnTakeDamage OnTakeDamage;
 };

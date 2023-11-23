@@ -79,7 +79,6 @@ void AAIController_CloseCombat::Tick(float DeltaSeconds)
 void AAIController_CloseCombat::UpdateState()
 {
 	AAICharacter_Base* PossessAI = Cast<AAICharacter_Base>(GetPawn());
-	//AAICharacter_Base* TargetEnemy = PossessAI->GetTargetEnemy();
 
 	if (PossessAI == nullptr || PossessAI->IsDead()) return;
 
@@ -87,7 +86,7 @@ void AAIController_CloseCombat::UpdateState()
 	if (M_TargetEnemy && !M_TargetEnemy->IsDead())
 	{
 		// 两者距离 <= 攻击范围
-		if (PossessAI->GetDistanceFromEnemy() <= PossessAI->AttackRadius)
+		if (GetDistanceFromEnemy() <= PossessAI->AttackRadius)
 		{
 			Set_IsInAttackRange(true);		// 设置一下状态
 			UpdateBBV_IsInAttackRange();	// 更新黑板值
@@ -101,7 +100,6 @@ void AAIController_CloseCombat::UpdateState()
 	// 不存在或者死亡，则设置一下 Target 为空，且重置攻击范围状态
 	else
 	{
-		//PossessAI->SetTargetEnemy(nullptr);
 		M_TargetEnemy = nullptr;
 		UpdateBBV_Target();
 
@@ -112,42 +110,6 @@ void AAIController_CloseCombat::UpdateState()
 
 void AAIController_CloseCombat::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	//AAICharacter_Base* Enemy = Cast<AAICharacter_Base>(Actor);
-	//AAICharacter_Base* PossessAI = Cast<AAICharacter_Base>(GetPawn());
-
-	//// 死亡，同阵营直接跳过
-	//if (!Enemy || Enemy->IsDead() || !PossessAI || PossessAI->IsDead() || (Enemy->GetCampType() == PossessAI->GetCampType()))
-	//{
-	//	return;
-	//}
-
-	//// 进入感知
-	//if (Stimulus.WasSuccessfullySensed())
-	//{
-	//	M_Blackboard->SetValueAsBool("IsPerception", true);		// 用于打断巡逻任务
-
-	//	if (!PossessAI->EnemyArray.Contains(Enemy))
-	//	{
-	//		PossessAI->EnemyArray.Add(Enemy);
-	//	}
-	//}
-	//// 离开感知
-	//else
-	//{
-	//	// 如果当前目标离开，则置空
-	//	if (Enemy == PossessAI->GetTargetEnemy())
-	//	{
-	//		PossessAI->SetTargetEnemy(nullptr);
-	//		UpdateBBV_Target();
-	//	}
-
-	//	// 如果队列里面有，则删除
-	//	if (PossessAI->EnemyArray.Contains(Enemy))
-	//	{
-	//		PossessAI->EnemyArray.Remove(Enemy);
-	//	}
-	//}
-
 	AAICharacter_Base* Enemy = Cast<AAICharacter_Base>(Actor);
 	AAICharacter_Base* PossessAI = Cast<AAICharacter_Base>(GetPawn());
 
@@ -173,7 +135,6 @@ void AAIController_CloseCombat::OnTargetPerceptionUpdated(AActor* Actor, FAIStim
 		// 如果当前目标离开，则置空
 		if (Enemy == M_TargetEnemy)
 		{
-			//PossessAI->SetTargetEnemy(nullptr);
 			M_TargetEnemy = nullptr;
 			UpdateBBV_Target();
 		}
@@ -194,7 +155,10 @@ void AAIController_CloseCombat::FindTarget()
 	}
 
 	M_TargetEnemy = SelectTarget();
-	
-	FinishFindTarget();
+
+	UpdateBBV_Target();
+
+	// 重置 IsPerception，以便 AI 可以巡逻
+	M_Blackboard->SetValueAsBool("IsPerception", false);
 }
 
