@@ -136,12 +136,12 @@ void AMyGameStateBase::AddAI(AAICharacter_Base* AI)
 			Camp_AIList_Ptr->Num++;
 
 			// --------------- test out -------------------------
-			UEnum* const CampType_Prt = StaticEnum<ECampType>();
-			UEnum* const SoldierType_Prt = StaticEnum<ESoldierType>();
-			auto camp_type = CampType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(CampType));
-			auto soldier_type = SoldierType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(SoldierType));
-			UE_LOG(LogTemp, Error, TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num);
-			GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Green, FString::Printf(TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num));
+			//UEnum* const CampType_Prt = StaticEnum<ECampType>();
+			//UEnum* const SoldierType_Prt = StaticEnum<ESoldierType>();
+			//auto camp_type = CampType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(CampType));
+			//auto soldier_type = SoldierType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(SoldierType));
+			//UE_LOG(LogTemp, Error, TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num);
+			//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Green, FString::Printf(TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num));
 		}
 	}
 }
@@ -163,12 +163,12 @@ void AMyGameStateBase::DeleteAI(AAICharacter_Base* AI)
 			Camp_Solider_AIList_Ptr->Num--;
 			Camp_AIList_Ptr->Num--;
 
-			UEnum* const CampType_Prt = StaticEnum<ECampType>();
-			UEnum* const SoldierType_Prt = StaticEnum<ESoldierType>();
-			auto camp_type = CampType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(CampType));
-			auto soldier_type = SoldierType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(SoldierType));
-			UE_LOG(LogTemp, Error, TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num);
-			GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Green, FString::Printf(TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num));
+			//UEnum* const CampType_Prt = StaticEnum<ECampType>();
+			//UEnum* const SoldierType_Prt = StaticEnum<ESoldierType>();
+			//auto camp_type = CampType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(CampType));
+			//auto soldier_type = SoldierType_Prt->GetDisplayNameTextByValue(static_cast<uint8>(SoldierType));
+			//UE_LOG(LogTemp, Error, TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num);
+			//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Green, FString::Printf(TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num));
 		}
 	}
 

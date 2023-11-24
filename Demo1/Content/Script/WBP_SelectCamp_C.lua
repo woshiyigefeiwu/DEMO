@@ -33,7 +33,7 @@ function WBP_SelectCamp:Init()
         local CampSubUI = NewObject(CampSubUIClass, self);
         
         self.CampsList:AddChild(CampSubUI);
-        CampSubUI:InitInfo(CampInfoList[i].Type);   -- 初始化一下按钮的样式以及阵营信息
+        CampSubUI:InitInfo(CampInfoList[i]);   -- 初始化一下按钮的样式以及阵营信息
     end
 
     -- print("WBP_SelectCamp:Init");

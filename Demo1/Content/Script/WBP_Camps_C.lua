@@ -17,8 +17,12 @@ function WBP_Camps:Bind()
     self.CampButton.OnClicked:Add(self, self.OnClickedCampButton);
 end
 
-function WBP_Camps:InitInfo(camp_type)
-    self.CampType = camp_type;
+function WBP_Camps:InitInfo(CampInfo)
+    self.CampType = CampInfo.Type;
+
+    -- self.Overridden.InitInfo(self,CampInfo);
+    self.SetColor(self,CampInfo);
+    self.SetText(self,CampInfo);
 end
 
 ------------------------- Event -----------------------------

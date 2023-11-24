@@ -9,9 +9,10 @@
 #include "Demo1/Demo1Character.h"
 #include "AICharacter_Base.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAfterPossessed);		// AIC possess 之后播一次，初始化一下（UI 之类的）
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAfterPossessed);		//
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLaunchAttack);		// 发起攻击
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTakeDamage);			// 受到伤害（刷一下 UI 等等）
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAIDead);			// 角色死亡
 
 UCLASS()
 class DEMO1_API AAICharacter_Base : public ADemo1Character
@@ -27,13 +28,13 @@ public:
 
 // ----------------------------------------- Init，Get，Set，Check 函数 ----------------------------------------------
 public:
-	// 初始化一些 AI 的属性
+	// 初始化一些 AI 的属性（时机：AIC OnPossess 时）
 	UFUNCTION()
 	virtual void Init();
 
-	// AIC OnPossess 之后的操作
-	UFUNCTION()
-	virtual void AfterOnPossessed();
+	// 蓝图重写，提供给蓝图去初始化一些东西（时机：BeginPlay）
+	UFUNCTION(BlueprintImplementableEvent)
+	void Init_BP();
 
 	// 获取当前 AI 的阵营类型
 	UFUNCTION()
@@ -121,6 +122,10 @@ public:
 
 // ----------------------------------------- AI 的基础属性 --------------------------------------------
 public:
+	// 显示血条
+	//UPROPERTY(EditAnywhere, Category = WidgetComponent)
+	//class UWidgetComponent* WidgetComponent;
+
 	// 最大生命值
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
 	float MaxHP;
@@ -210,4 +215,8 @@ public:
 	// 受到攻击
 	UPROPERTY(BlueprintAssignable)
 	FOnTakeDamage OnTakeDamage;
+
+	// 角色死亡
+	UPROPERTY(BlueprintAssignable)
+	FOnAIDead OnAIDead;
 };

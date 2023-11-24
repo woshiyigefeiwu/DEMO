@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/AssetManager.h"
+//#include "Demo1/AICharacter/AICharacter_Base.h"
 //#include "IDamageInterface.h"
 
 // Sets default values
@@ -20,22 +21,19 @@ AProjectile::AProjectile()
 
 	DamageType = UDamageType::StaticClass();
 
-	//static ConstructorHelpers::FObjectFinder<UParticleSystem> DefaultExplosionEffect(*(M_ExplosionPath.ToString()));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DefaultExplosionEffect(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
 	if (DefaultExplosionEffect.Succeeded())
 	{
 		ExplosionEffect = DefaultExplosionEffect.Object;
 	}
 
-	//定义将作为投射物及其碰撞的根组件的SphereComponent。
+	// 定义将作为投射物及其碰撞的根组件的SphereComponent。
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
-	//SphereComponent->InitSphereRadius(M_CollisionRadius);
 	SphereComponent->InitSphereRadius(12.5f);
 	SphereComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	RootComponent = SphereComponent;
 
-	//定义将作为视觉呈现的网格体。
-	//static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(*(M_MoudelPath.ToString()));
+	// 定义将作为视觉呈现的网格体。
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	StaticMesh->SetupAttachment(RootComponent);
@@ -46,28 +44,19 @@ AProjectile::AProjectile()
 		StaticMesh->SetRelativeScale3D(FVector(0.25f, 0.25f, 0.25f));
 	}
 
-	//定义投射物移动组件。
+	// 定义投射物移动组件。
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovementComponent->SetUpdatedComponent(SphereComponent);
-	//ProjectileMovementComponent->InitialSpeed = M_FlightSpeed;
-	//ProjectileMovementComponent->MaxSpeed = M_FlightSpeed;
 	ProjectileMovementComponent->InitialSpeed = 1500.0f;
 	ProjectileMovementComponent->MaxSpeed = 1500.0f;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
-
-	//在击中事件上注册此投射物撞击函数。
-	SphereComponent->OnComponentHit.AddDynamic(this, &AProjectile::OnProjectileImpact);
-
-	UE_LOG(LogTemp, Error, TEXT("this is AProjectile::AProjectile(), %f"), M_FlightSpeed);
 }
 
 // Called when the game starts or when spawned
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	UE_LOG(LogTemp, Error, TEXT("this is AProjectile::BeginPlay(), %f"), M_FlightSpeed);
 }
 
 // Called every frame
@@ -78,7 +67,33 @@ void AProjectile::Tick(float DeltaTime)
 	// 检查是否超出飞行距离
 	if (IsOutOfFlightRange())
 	{
-		Destroyed();
+		Destroy();
+	}
+}
+
+void AProjectile::OnOverlayBegin(UPrimitiveComponent* OverlappedComp, AActor* Other, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 对面死亡，或者同一阵营则跳过
+	AAICharacter_Base* HitAI = Cast<AAICharacter_Base>(Other);
+	AProjectile* HitProjectile = Cast<AProjectile>(Other);
+
+	// 撞到 AI
+	if (HitAI)
+	{
+		// 如果 AI 死了或者同阵营则穿过，否则爆炸
+		if (!(HitAI->IsDead() || HitAI->GetCampType() == M_OwnerCampType))
+		{
+			UGameplayStatics::ApplyDamage(HitAI, M_Damage, GetInstigator()->GetController(), this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
+			Destroy();
+		}
+
+		UE_LOG(LogTemp, Error, TEXT("------------------------------------------ this is AProjectile::OnOverlayBegin() AIAIAIAIAIAIAIAI--------------------------------"));
+	}
+	// 排除同类，撞到其他的东西，直接爆炸
+	else if(HitProjectile == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("------------------------------------------ this is AProjectile::OnOverlayBegin() wwwwwwwwwwwwwwwwwwww--------------------------------"));
+		Destroy();
 	}
 }
 
@@ -86,31 +101,13 @@ void AProjectile::Init(AAICharacter_Base* OwnerCharacter)
 {
 	DamageType = UDamageType::StaticClass();
 
-	// 初始化一下配置
-	//FString ExplosionPath = M_ExplosionPath.ToString();
-	//const TCHAR* ObjectToFind_1 = *ExplosionPath;
-	//static ConstructorHelpers::FObjectFinder<UParticleSystem> DefaultExplosionEffect(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
-	//if (DefaultExplosionEffect.Succeeded())
-	//{
-	//	ExplosionEffect = DefaultExplosionEffect.Object;
-	//}
-
 	UParticleSystem* NewExplosion = UAssetManager::GetStreamableManager().LoadSynchronous<UParticleSystem>(M_ExplosionPath.GetAssetPathString(), false, nullptr);
 	if (NewExplosion)
 	{
-		//StaticMesh->SetStaticMesh(NewExplosion);
 		ExplosionEffect = NewExplosion;
 	}
 
 	SphereComponent->InitSphereRadius(M_CollisionRadius);
-
-	//FString MoudelPath = M_MoudelPath.ToString();
-	//const TCHAR* ObjectToFind_2 = *MoudelPath;
-	//static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(TEXT("/Game/StarterContent/Shapes/Shape_Cube.Shape_Cube"));
-	//if (DefaultMesh.Succeeded())
-	//{
-	//	StaticMesh->SetStaticMesh(DefaultMesh.Object);
-	//}
 
 	UStaticMesh* NewStaticMesh = UAssetManager::GetStreamableManager().LoadSynchronous<UStaticMesh>(M_MoudelPath.GetAssetPathString(), false, nullptr);
 	if (NewStaticMesh)
@@ -129,6 +126,9 @@ void AProjectile::Init(AAICharacter_Base* OwnerCharacter)
 		M_Damage = M_OwnerCharacter->GetAtk();
 		M_CreateLocation = GetActorLocation();
 	}
+
+	// 注册一下重叠事件
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnOverlayBegin);
 }
 
 void AProjectile::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -145,7 +145,7 @@ void AProjectile::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* 
 	Destroy();
 }
 
-void AProjectile::Destroyed()
+void AProjectile::PlayEffect()
 {
 	FVector spawnLocation = GetActorLocation();
 	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionEffect, spawnLocation, FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);

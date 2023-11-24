@@ -36,7 +36,7 @@ void AMyPlayerController::SpawnAI(FSoftClassPath SoftClassPath, FVector MouseLoc
 	// 将 AI 添加到 GS 中
 	if (AI && GS)
 	{
-		AI->SetCampType(GS->GetCurrentCamp());
+		//AI->SetCampType(GS->GetCurrentCamp());
 		GS->AddAI(AI);
 	}
 }

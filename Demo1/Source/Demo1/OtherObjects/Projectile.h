@@ -29,6 +29,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// 重叠事件
+	UFUNCTION()
+	void OnOverlayBegin(UPrimitiveComponent* OverlappedComp, AActor* Other, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	// 初始化一下发射物
 	UFUNCTION()
@@ -38,8 +41,8 @@ public:
 	UFUNCTION()
 	void OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	// 销毁函数
-	void Destroyed() override;
+	// 播放特效
+	void PlayEffect();
 
 	// 判断是否超出飞行范围
 	UFUNCTION()

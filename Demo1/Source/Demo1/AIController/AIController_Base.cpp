@@ -182,3 +182,10 @@ AAICharacter_Base* AAIController_Base::SelectTarget_Nearest()
 
 	return nullptr;
 }
+
+// 处理 AI 死亡
+void AAIController_Base::AIDead()
+{
+	// 目前只有停止行为树
+	M_BehaviorTree->StopLogic("AIDead");
+}

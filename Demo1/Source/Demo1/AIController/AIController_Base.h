@@ -84,6 +84,10 @@ public:
 	// 找距离最近的敌人（派生类可自己重写）
 	virtual AAICharacter_Base* SelectTarget_Nearest();
 
+	// 处理 AI 死亡
+	UFUNCTION()
+	void AIDead();
+
 // -------------------------------------------- AI Data ------------------------------------
 protected:
 	UPROPERTY()

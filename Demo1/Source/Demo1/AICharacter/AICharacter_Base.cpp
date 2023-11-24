@@ -7,9 +7,12 @@
 #include "Demo1/Manager/MyGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Demo1/Manager/MyGameModeBase.h"
+#include "Components//WidgetComponent.h"
 
 AAICharacter_Base::AAICharacter_Base()
 {
+	//WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	//WidgetComponent->SetupAttachment(RootComponent);
 }
 
 void AAICharacter_Base::Tick(float DeltaSeconds)
@@ -21,7 +24,7 @@ void AAICharacter_Base::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	AfterOnPossessed();
+	Init_BP();
 }
 
 // ----------------------------------------- Init，Get，Set，Check 函数 ----------------------------------------------
@@ -32,11 +35,13 @@ void AAICharacter_Base::Init()
 	M_CurrentHP = MaxHP;
 	M_IsDead = false;
 	M_IsAttack = false;
-}
 
-void AAICharacter_Base::AfterOnPossessed()
-{
-	OnAfterPossessed.Broadcast();
+	// 阵营信息
+	AMyGameStateBase* GS = Cast<AMyGameStateBase>(GetWorld()->GetGameState());
+	if (GS)
+	{
+		SetCampType(GS->GetCurrentCamp());
+	}
 }
 
 ECampType AAICharacter_Base::GetCampType()
@@ -103,6 +108,23 @@ bool AAICharacter_Base::IsInAttackCD()
 	return GetWorldTimerManager().IsTimerActive(M_TimerHandle) == true;
 }
 
+//void AAICharacter_Base::InitHpUI()
+//{
+	//// 初始化一下 UI
+	//const AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(this));
+	//if (GM && GM->GeneralDataAsset)
+	//{
+	//	FString HpBarPath = "Blueprint'";
+	//	HpBarPath.Append(GM->GeneralDataAsset->HpBar_Path.ToString());
+	//	HpBarPath.Append("'");
+
+	//	UClass* HpBarClass = LoadClass<UUserWidget>(NULL, *HpBarPath);
+	//	WidgetComponent->SetWidgetClass(HpBarClass);
+	//}
+
+	//WidgetComponent->GetWidget();
+//}
+
 // ------------------------------------------- 辅助函数 -----------------------------------
 
 void AAICharacter_Base::UpdateWalkSpeed()
@@ -127,6 +149,7 @@ float AAICharacter_Base::TakeDamage(float DamageTaken, FDamageEvent const& Damag
 	}
 
 	OnTakeDamage.Broadcast();
+	//RefreshHpUI();
 
 	return CurrentHP;
 }
@@ -135,7 +158,7 @@ void AAICharacter_Base::AIDead()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is AIDead()");
 
-	M_IsDead = false;
+	M_IsDead = true;
 
 	AMyGameStateBase* GS = Cast<AMyGameStateBase>(GetWorld()->GetGameState());
 	if (GS)
@@ -143,8 +166,17 @@ void AAICharacter_Base::AIDead()
 		GS->DeleteAI(this);
 	}
 
-	// 销毁（可能得抛个事件出去，然后拨个动画之类的）
-	Destroyed();
+	// 抛个事件出去，然后拨个动画之类的（播完销毁AI）
+	OnAIDead.Broadcast();
+
+	// 交给 AIC 去处理逻辑（停止行为树）
+	AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
+	if (AIC)
+	{
+		AIC->AIDead();
+	}
+
+	//Destroy();
 }
 
 void AAICharacter_Base::EntryAttackCD()

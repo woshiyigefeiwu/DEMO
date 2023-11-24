@@ -54,7 +54,11 @@ struct FCampInfo
 
 	// 阵营的图片显示
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FSoftObjectPath CampImage;		
+	FSoftObjectPath CampImage;
+
+	// 阵营显示的文字
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString CampName;
 };
 
 /**
@@ -73,10 +77,14 @@ public:
 	TArray<FSoftClassPath> SoldierInfoList;
 
 	// UI 总配置，UI 唯一id，对应UI路径
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "UIConfig"))
+	UPROPERTY(EditAnywhere, Category = UIConfig)
 	TMap<FString, FSoftClassPath> UIMap;
 
 	// 默认打开的UI
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "UIConfig"))
+	UPROPERTY(EditAnywhere, Category=UIConfig)
 	FString DefaultUI;
+
+	// 血条 UI 控件
+	UPROPERTY(EditAnywhere, Category=UIConfig)
+	FSoftClassPath HpBar_Path;
 };
