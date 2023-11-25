@@ -98,6 +98,11 @@ float AAICharacter_Base::SetCurrentHP(float NewHP)
 	return M_CurrentHP;
 }
 
+FString AAICharacter_Base::GetImagePath()
+{
+	return ShowImage.ToString();
+}
+
 float AAICharacter_Base::GetAtk()
 {
 	return Atk;

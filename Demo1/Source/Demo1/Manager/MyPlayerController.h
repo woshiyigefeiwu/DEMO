@@ -33,6 +33,10 @@ public:
 
 	// ------------------------------------------ other --------------------------------------------
 
+	// 反射获取蓝图类对象
+	UFUNCTION(BlueprintCallable)
+	AAICharacter_Base* GetAIDefaultObject(FSoftClassPath AISoftClassPath);
+
 	//UFUNCTION()
 	//void HideMouse();
 

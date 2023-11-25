@@ -80,6 +80,10 @@ public:
 	UFUNCTION()
 	float SetCurrentHP(float NewHP);
 
+	// 获取显示的图片
+	UFUNCTION(BlueprintCallable)
+	FString GetImagePath();
+
 // ------------------------------------------- 辅助函数 -----------------------------------
 public:
 	// 更新一下 AI 的行走速度

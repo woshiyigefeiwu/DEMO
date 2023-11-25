@@ -50,6 +50,13 @@ UClass* AMyPlayerController::LoadAIClass(FSoftClassPath SoftClassPath)
 	return AIClass;
 }
 
+AAICharacter_Base* AMyPlayerController::GetAIDefaultObject(FSoftClassPath AISoftClassPath)
+{
+	UClass* AIClass = LoadAIClass(AISoftClassPath);
+	AAICharacter_Base* AI_Base = Cast<AAICharacter_Base>(AIClass->GetDefaultObject());
+	return AI_Base;
+}
+
 //void AMyPlayerController::HideMouse()
 //{
 //	bShowMouseCursor = false;
