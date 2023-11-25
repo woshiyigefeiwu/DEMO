@@ -39,12 +39,6 @@ end
 ----------------------------- Event -------------------------
 
 function WBP_PlaceAI:OnClickedReturnButton()
-    -- local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
-    -- local MyPC = MyPawn:GetController();
-    -- if(MyPC) then
-    --     MyPC:OnClick_PlaceAIReturn();
-    -- end
-
     local GS = UE.UGameplayStatics.GetGameState(self);
     if(GS and GS:GetUIManager()) then
         local UIM = GS:GetUIManager();
@@ -54,11 +48,6 @@ end
 
 function WBP_PlaceAI:OnClickedStart()
     self:ReleaseGame();
-    -- local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
-    -- local MyPC = MyPawn:GetController();
-    -- if(MyPC) then
-    --     MyPC:OnClick_GameStart();
-    -- end
 
     local GS = UE.UGameplayStatics.GetGameState(self);
     if(GS and GS:GetUIManager()) then

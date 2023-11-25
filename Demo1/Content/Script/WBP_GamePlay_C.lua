@@ -21,11 +21,24 @@ function WBP_GamePlay:Bind()
     self.ContinueButton.OnClicked:Add(self, self.OnClickedContinueButton);
     self.RestartButton.OnClicked:Add(self, self.OnClickedRestartButton);
     self.ExitButton.OnClicked:Add(self, self.OnClickedExitButton);
+    self.GameDataButton.OnClicked:Add(self,self.OnClickedGameDataButton);
 end
 
 function WBP_GamePlay:Init()
-    if(self.ButtonList:IsVisible()) then
-        self.ButtonList:SetVisibility(UE.ESlateVisibility.Collapsed)
+    self:SetUIVisible(self.ButtonList,false);
+    self:SetUIVisible(self.GameData, true);
+
+    -- 初始化一下阵营数据按钮
+    local GS = UE.UGameplayStatics.GetGameState(self);
+    local CampInfoList = GS:GetCampInfoList();
+
+    self.GameData:ClearChildren()
+    for i=1,CampInfoList:Length() do
+        local CampSubUIClass = UE.UClass.Load("/Game/Demo/BluePrints/UI/WBP_GameData_Camp.WBP_GameData_Camp_C")    -- 注意路径
+        local CampSubUI = NewObject(CampSubUIClass, self);
+        
+        self.GameData:AddChild(CampSubUI);
+        CampSubUI:InitInfo(CampInfoList[i]);   -- 初始化一下按钮的样式以及阵营信息
     end
 end
 
@@ -39,25 +52,34 @@ end
 -- 暂停按钮
 function WBP_GamePlay:OnClickedPauseButton()
     self:PauseGame();   -- 蓝图，暂停游戏
-    self:IsShowButtonList(self.ButtonList,true);
-    self:IsShowButtonList(self.PauseButton,false);
+    self:SetUIVisible(self.ButtonList,true);
+    self:SetUIVisible(self.PauseButton,false);
+    self:SetUIVisible(self.GameDataButton,false);
+    self:SetUIVisible(self.GameData,false);
 end
 
 -- 继续按钮
 function WBP_GamePlay:OnClickedContinueButton()
     self:ReleaseGame(); -- 蓝图，继续游戏
-    self:IsShowButtonList(self.ButtonList,false);
-    self:IsShowButtonList(self.PauseButton,true);
+    self:SetUIVisible(self.ButtonList,false);
+    self:SetUIVisible(self.PauseButton,true);
+    self:SetUIVisible(self.GameDataButton,true);
 end
 
 -- 重新开始按钮
 function WBP_GamePlay:OnClickedRestartButton()
-    -- self:ReleaseGame();
     self:RestartGame();
 end
 
+-- 数据展示按钮
+function WBP_GamePlay:OnClickedGameDataButton()
+    self:ReverseUI(self.GameData);
+end
 
-function WBP_GamePlay:IsShowButtonList(UI, flag)
+------------------- 辅助函数 -----------------
+
+-- 设置 UI 的显示隐藏
+function WBP_GamePlay:SetUIVisible(UI, flag)
     if(flag) then
         if(UI:IsVisible() == false) then
             UI:SetVisibility(UE.ESlateVisibility.Visible)
@@ -66,6 +88,15 @@ function WBP_GamePlay:IsShowButtonList(UI, flag)
         if(UI:IsVisible()) then
             UI:SetVisibility(UE.ESlateVisibility.Collapsed)
         end
+    end
+end
+
+-- 反转 UI ，显示->隐藏，隐藏->显示
+function WBP_GamePlay:ReverseUI(UI)
+    if(UI:IsVisible()) then
+        UI:SetVisibility(UE.ESlateVisibility.Collapsed)
+    else
+        UI:SetVisibility(UE.ESlateVisibility.Visible)
     end
 end
 

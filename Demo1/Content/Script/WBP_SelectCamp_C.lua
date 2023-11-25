@@ -35,9 +35,6 @@ function WBP_SelectCamp:Init()
         self.CampsList:AddChild(CampSubUI);
         CampSubUI:InitInfo(CampInfoList[i]);   -- 初始化一下按钮的样式以及阵营信息
     end
-
-    -- print("WBP_SelectCamp:Init");
-    -- self:SetUIMode();
 end
 
 ------------------------------ Event -------------------------------
@@ -51,12 +48,6 @@ function WBP_SelectCamp:OnClickedSelectButton()
 end
 
 function WBP_SelectCamp:OnClickedReturnButton()
-    -- local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
-    -- local MyPC = MyPawn:GetController();
-    -- if(MyPC) then
-    --     MyPC:OnClick_SelectCampReturn();
-    -- end
-
     local GS = UE.UGameplayStatics.GetGameState(self);
     if(GS and GS:GetUIManager()) then
         local UIM = GS:GetUIManager();
@@ -66,12 +57,7 @@ end
 
 function WBP_SelectCamp:OnClickedStart()
     self:ReleaseGame();
-    -- local MyPawn = UE.UGameplayStatics.GetPlayerPawn(self,0);
-    -- local MyPC = MyPawn:GetController();
-    -- if(MyPC) then
-    --     MyPC:OnClick_GameStart();
-    -- end
-
+    
     local GS = UE.UGameplayStatics.GetGameState(self);
     if(GS and GS:GetUIManager()) then
         local UIM = GS:GetUIManager();

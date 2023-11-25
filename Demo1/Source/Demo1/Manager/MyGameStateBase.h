@@ -10,6 +10,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "MyGameStateBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAINumChange);			// AI 数量改变的时候抛一个
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverDelegate);
 
 // 当前阵营，当前兵种下的所有AI
@@ -56,7 +57,7 @@ public:
 	UFUNCTION()
 	TArray<FCampInfo> GetCampInfoList();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	TArray<FSoftClassPath> GetSoldierInfoList();
 
 	UFUNCTION(BlueprintCallable)
@@ -77,11 +78,30 @@ public:
 	UFUNCTION()
 	void CreateUIManager();
 
+	UFUNCTION()
+	UClass* LoadClass_AIBase(FSoftClassPath SoftClassPath);
+
+	UFUNCTION()
+	AAICharacter_Base* GetDefaultObject_AIBase(FSoftClassPath SoftClassPath);
+
+	UFUNCTION(BlueprintCallable)
+	int GetNumByCampType(ECampType CampType);
+
+	UFUNCTION(BlueprintCallable)
+	int GetNumByCampSoliderType(ECampType CampType, ESoldierType SoldierType);
+
+	UFUNCTION(BlueprintCallable)
+	ESoldierType GetSoliderType(FSoftClassPath AIClassPath);
+
+	UFUNCTION(BlueprintCallable)
+	FString GetDisplayStrBySoliderType(ESoldierType SoldierType);
 
 public:
 	UPROPERTY()
 	FGameOverDelegate GameOverDelegate;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnAINumChange OnAINumChange;
 
 private:
 	UPROPERTY(EditAnywhere)

@@ -144,6 +144,8 @@ void AMyGameStateBase::AddAI(AAICharacter_Base* AI)
 			//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Green, FString::Printf(TEXT("Camp is : %s -------- Solier is : %s ---------- Camp num is : %d --------"), *camp_type.ToString(), *soldier_type.ToString(), Camp_AIList_Ptr->Num));
 		}
 	}
+
+	OnAINumChange.Broadcast();
 }
 
 // 删除 AI
@@ -178,6 +180,8 @@ void AMyGameStateBase::DeleteAI(AAICharacter_Base* AI)
 		// 抛事件出去，PC
 		GameOverDelegate.Broadcast();
 	}
+
+	OnAINumChange.Broadcast();
 }
 
 AUIManager* AMyGameStateBase::GetUIManager()
@@ -189,5 +193,83 @@ void AMyGameStateBase::CreateUIManager()
 {
 	M_UIManager = GWorld->SpawnActor<AUIManager>();
 }
+
+int AMyGameStateBase::GetNumByCampType(ECampType CampType)
+{
+	if (M_AIList.Contains(CampType))
+	{
+		return M_AIList[CampType].Num;
+	}
+
+	return 0;
+}
+
+int AMyGameStateBase::GetNumByCampSoliderType(ECampType CampType, ESoldierType SoldierType)
+{
+	if (M_AIList.Contains(CampType))
+	{
+		FCamp_AIList* Camp_AIList_Ptr = &M_AIList[CampType];
+		if (Camp_AIList_Ptr->Camp_AIList.Contains(SoldierType))
+		{
+			return Camp_AIList_Ptr->Camp_AIList[SoldierType].Num;
+		}
+	}
+
+	return 0;
+}
+
+UClass* AMyGameStateBase::LoadClass_AIBase(FSoftClassPath SoftClassPath)
+{
+	FString AIPath = "Blueprint'";
+	AIPath.Append(SoftClassPath.ToString());
+	AIPath.Append("'");
+	UClass* AIClass = LoadClass<AActor>(NULL, *AIPath);
+	return AIClass;
+}
+
+AAICharacter_Base* AMyGameStateBase::GetDefaultObject_AIBase(FSoftClassPath SoftClassPath)
+{
+	UClass* AIClass = LoadClass_AIBase(SoftClassPath);
+	if (AIClass)
+	{
+		AAICharacter_Base* DefaultObject_AIBase = Cast<AAICharacter_Base>(AIClass->GetDefaultObject());
+		return DefaultObject_AIBase;
+	}
+	return nullptr;
+}
+
+ESoldierType AMyGameStateBase::GetSoliderType(FSoftClassPath AIClassPath)
+{
+	for (int i = 0; i < M_SoldierInfoList.Num(); i++)
+	{
+		if (AIClassPath == M_SoldierInfoList[i])
+		{
+			AAICharacter_Base* DefaultObject_AIBase = GetDefaultObject_AIBase(AIClassPath);
+			if (DefaultObject_AIBase)
+			{
+				return DefaultObject_AIBase->GetSoldierType();
+			}	
+		}
+	}	
+
+	return ESoldierType();
+}
+
+FString AMyGameStateBase::GetDisplayStrBySoliderType(ESoldierType SoldierType)
+{
+	for (int i = 0; i < M_SoldierInfoList.Num(); i++)
+	{
+		AAICharacter_Base* DefaultObject_AIBase = GetDefaultObject_AIBase(M_SoldierInfoList[i]);
+		if (DefaultObject_AIBase->GetSoldierType() == SoldierType)
+		{
+			return DefaultObject_AIBase->GetDisplayStr();
+		}
+	}
+
+	return FString();
+}
+
+
+
 
 

@@ -59,6 +59,10 @@ struct FCampInfo
 	// 阵营显示的文字
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString CampName;
+
+	// 显示当前阵营剩余人数时，显示的string
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString LeftNumDisplay;
 };
 
 /**

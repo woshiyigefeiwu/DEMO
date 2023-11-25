@@ -77,8 +77,7 @@ void AUIManager::ShowUI(FString UIName)
 	// 没有 UI 再创建
 	if (M_UICache.Contains(UIName) == false || M_UICache[UIName] == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("This UI Is Not Create."));
-
+		//UE_LOG(LogTemp, Warning, TEXT("This UI Is Not Create."));
 		M_UICache.Add(UIName, CreateUI(UIName));
 	}
 
@@ -109,7 +108,7 @@ UUserWidget* AUIManager::CreateUI(FString UIName)
 
 void AUIManager::OnGameOver()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, FString::Printf(TEXT("this is OnGameOver()")));
+	GEngine->AddOnScreenDebugMessage(-1, 300, FColor::Red, FString::Printf(TEXT("this is OnGameOver()")));
 
 	//ShowUI("UI_GameOver");
 }

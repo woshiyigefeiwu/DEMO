@@ -20,14 +20,7 @@ AMyGameModeBase::AMyGameModeBase()
 
 void AMyGameModeBase::BeginPlay()
 {
-	if (GeneralDataAsset)
-	{
-		UE_LOG(LogTemp, Error, TEXT("GeneralDataAsset YES"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("GeneralDataAsset NO"));
-	}
+
 }
 
 UGeneralDataAsset* AMyGameModeBase::GetGeneralDataAsset()

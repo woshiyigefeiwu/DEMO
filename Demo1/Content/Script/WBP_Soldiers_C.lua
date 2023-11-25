@@ -24,7 +24,6 @@ function WBP_Soldiers:InitInfo(SoldierInfo)
     end
 end
 
-
 --function WBP_Soldiers:Initialize(Initializer)
 --end
 

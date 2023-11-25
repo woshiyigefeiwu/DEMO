@@ -84,6 +84,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FString GetImagePath();
 
+	// 获取显示的文本
+	UFUNCTION(BlueprintCallable)
+	FString GetDisplayStr() {return DisplayStr;}
+
 // ------------------------------------------- 辅助函数 -----------------------------------
 public:
 	// 更新一下 AI 的行走速度
@@ -183,6 +187,10 @@ public:
 	// 攻击范围（追击敌人到此范围内的时候就发起攻击）
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
 	float AttackRadius;
+
+	// 当前兵种要显示的数据文本
+	UPROPERTY(EditAnywhere, Category = "BaseConfig")
+	FString DisplayStr;
 
 protected:
 	// 当前生命值

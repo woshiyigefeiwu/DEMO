@@ -140,7 +140,7 @@ void AAICharacter_Base::UpdateWalkSpeed()
 
 float AAICharacter_Base::TakeDamage(float DamageTaken, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, FString::Printf(TEXT("this is TakeDamage(), the Damage is %f"), DamageTaken));
+	//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, FString::Printf(TEXT("this is TakeDamage(), the Damage is %f"), DamageTaken));
 
 	float CurrentHP = M_CurrentHP;
 	if (CurrentHP > 0)
@@ -161,7 +161,7 @@ float AAICharacter_Base::TakeDamage(float DamageTaken, FDamageEvent const& Damag
 
 void AAICharacter_Base::AIDead()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is AIDead()");
+	//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is AIDead()");
 
 	M_IsDead = true;
 
@@ -186,14 +186,14 @@ void AAICharacter_Base::AIDead()
 
 void AAICharacter_Base::EntryAttackCD()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 300, FColor::Yellow, "AAICharacter_Base::EntryAttackCD");
+	//GEngine->AddOnScreenDebugMessage(-1, 300, FColor::Yellow, "AAICharacter_Base::EntryAttackCD");
 
 	GetWorldTimerManager().SetTimer(M_TimerHandle, this, &AAICharacter_Base::ClearTimerHandle, AtkCD, false);
 }
 
 void AAICharacter_Base::ClearTimerHandle()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Yellow, "this is AAICharacter_Base::ClearTimerHandle()");
+	//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Yellow, "this is AAICharacter_Base::ClearTimerHandle()");
 
 	GetWorldTimerManager().ClearTimer(M_TimerHandle);
 }
@@ -218,7 +218,7 @@ void AAICharacter_Base::AI_ApplyDamage(AAICharacter_Base* Enemy)
 		if (Enemy && AIC->GetDistanceFromEnemy() <= AttackRadius)
 		{
 			UGameplayStatics::ApplyDamage(Enemy, Atk, AIC, this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
-			GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is TryApplyDamage() succeed !!!£¨CloseCombat£©");
+			//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is TryApplyDamage() succeed !!!£¨CloseCombat£©");
 		}
 	}
 }

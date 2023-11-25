@@ -13,7 +13,7 @@ void AAICharacter_LongRange::BeginPlay()
 
 void AAICharacter_LongRange::AttackEnemy(AAICharacter_Base* Enemy)
 {
-	UE_LOG(LogTemp, Error, TEXT("this is AAICharacter_LongRange::AttackEnemy()"));
+	//UE_LOG(LogTemp, Error, TEXT("this is AAICharacter_LongRange::AttackEnemy()"));
 
 	// À¶Í¼ÄÇ±ß°ó¶¨£¬¿ªÊ¼²¥¹¥»÷¶¯»­
 	OnLaunchAttack.Broadcast();
