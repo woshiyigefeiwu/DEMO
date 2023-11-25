@@ -54,10 +54,6 @@ public:
 
 // -------------------------------------------- 辅助函数 -----------------------------------
 public:
-	// 运行 行为树
-	UFUNCTION()
-	void RunAIBehaviorTree(APawn* InPawn);
-
 	// 更新黑板值 IsPerception
 	UFUNCTION()
 	void UpdateBBV_IsInAttackRange();
@@ -87,6 +83,18 @@ public:
 	// 处理 AI 死亡
 	UFUNCTION()
 	void AIDead();
+
+	// 运行 行为树
+	UFUNCTION()
+	void RunAIBehaviorTree(APawn* InPawn);
+
+	// 初始化一下感知组件（派生类去重写就行）
+	UFUNCTION()
+	virtual void InitAIPerception(APawn* InPawn) {}
+
+	// 游戏释放的时候调一下这个（初始化感知组件 + 运行行为树）
+	UFUNCTION()
+	virtual void OnGamePlay();
 
 // -------------------------------------------- AI Data ------------------------------------
 protected:

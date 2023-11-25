@@ -84,15 +84,17 @@ void AProjectile::OnOverlayBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 		if (!(HitAI->IsDead() || HitAI->GetCampType() == M_OwnerCampType))
 		{
 			UGameplayStatics::ApplyDamage(HitAI, M_Damage, GetInstigator()->GetController(), this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
+			PlayEffect();
 			Destroy();
 		}
 
-		UE_LOG(LogTemp, Error, TEXT("------------------------------------------ this is AProjectile::OnOverlayBegin() AIAIAIAIAIAIAIAI--------------------------------"));
+		//UE_LOG(LogTemp, Error, TEXT("------------------------------------------ this is AProjectile::OnOverlayBegin() AIAIAIAIAIAIAIAI--------------------------------"));
 	}
 	// 排除同类，撞到其他的东西，直接爆炸
 	else if(HitProjectile == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("------------------------------------------ this is AProjectile::OnOverlayBegin() wwwwwwwwwwwwwwwwwwww--------------------------------"));
+		//UE_LOG(LogTemp, Error, TEXT("------------------------------------------ this is AProjectile::OnOverlayBegin() wwwwwwwwwwwwwwwwwwww--------------------------------"));
+		PlayEffect();
 		Destroy();
 	}
 }

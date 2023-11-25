@@ -9,6 +9,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "MyGameModeBase.generated.h"
 
+// 用于通知游戏开始运行（点击 GamePlay 按钮之后）
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayGame);	
+
 /**
  * 
  */
@@ -26,7 +29,13 @@ public:
 	UFUNCTION()
 	UGeneralDataAsset* GetGeneralDataAsset();
 
+	UFUNCTION()
+	void PlayGame();
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataAssets")
 	UGeneralDataAsset* GeneralDataAsset = nullptr;
+
+	UPROPERTY()
+	FOnPlayGame OnPlayGame;
 };

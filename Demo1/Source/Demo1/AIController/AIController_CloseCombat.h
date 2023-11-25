@@ -37,6 +37,12 @@ public:
 
 	void FindTarget() override;
 
+	// 初始化感知组件
+	void InitAIPerception(APawn* InPawn) override;
+
+	// 游戏释放的时候调一下这个（初始化感知组件 + 运行行为树）
+	//void OnGamePlay();
+
 private:
 	UPROPERTY()
 	class UAISenseConfig_Sight* SightConfig = nullptr;

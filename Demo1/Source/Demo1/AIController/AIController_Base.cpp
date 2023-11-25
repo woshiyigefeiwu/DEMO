@@ -5,6 +5,7 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Demo1/AICharacter/AICharacter_Base.h"
 #include "Demo1/Manager/MyGamestateBase.h"
+#include "Demo1/Manager/MyGameModeBase.h"
 
 AAIController_Base::AAIController_Base()
 {
@@ -16,7 +17,12 @@ void AAIController_Base::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	RunAIBehaviorTree(InPawn);
+	// 绑定一下游戏开始
+	AMyGameModeBase* GM = Cast<AMyGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GM)
+	{
+		GM->OnPlayGame.AddDynamic(this, &AAIController_Base::OnGamePlay);
+	}
 }
 
 void AAIController_Base::BeginPlay()
@@ -188,4 +194,15 @@ void AAIController_Base::AIDead()
 {
 	// 目前只有停止行为树
 	M_BehaviorTree->StopLogic("AIDead");
+}
+
+void AAIController_Base::OnGamePlay()
+{
+	APawn* InPawn = GetPawn();
+
+	// 初始化感知组件
+	InitAIPerception(InPawn);
+
+	// 运行行为树
+	RunAIBehaviorTree(InPawn);
 }

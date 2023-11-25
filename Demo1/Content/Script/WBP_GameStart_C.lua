@@ -19,7 +19,7 @@ function WBP_GameStart:Bind()
     self.PlaceStageButton.OnClicked:Add(self, self.OnClickedPlace);
     self.StartStageButton.OnClicked:Add(self, self.OnClickedStart);
 
-    self:PauseGame();   -- ¿∂Õº£¨‘›Õ£”Œœ∑
+    -- self:PauseGame();   -- ¿∂Õº£¨‘›Õ£”Œœ∑
 end
 
 ----------------------------- Event -----------------------------
@@ -33,7 +33,7 @@ function WBP_GameStart:OnClickedPlace()
 end
 
 function WBP_GameStart:OnClickedStart()
-    self:ReleaseGame();
+    -- self:ReleaseGame();
 
     local GS = UE.UGameplayStatics.GetGameState(self);
     if(GS and GS:GetUIManager()) then

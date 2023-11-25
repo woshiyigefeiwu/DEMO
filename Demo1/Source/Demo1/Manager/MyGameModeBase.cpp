@@ -27,3 +27,8 @@ UGeneralDataAsset* AMyGameModeBase::GetGeneralDataAsset()
 {
 	return GeneralDataAsset;
 }
+
+void AMyGameModeBase::PlayGame()
+{
+	OnPlayGame.Broadcast();
+}

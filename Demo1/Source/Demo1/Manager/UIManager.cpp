@@ -88,6 +88,13 @@ void AUIManager::ShowUI(FString UIName)
 	{
 		M_CurrentUI->AddToViewport();
 	}
+
+	// 检查是否启动游戏
+	AMyGameModeBase* GM = Cast<AMyGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GM && GM->GeneralDataAsset && GM->GeneralDataAsset->GamePlayUI == UIName)
+	{
+		GM->PlayGame();
+	}
 }
 
 UUserWidget* AUIManager::CreateUI(FString UIName)

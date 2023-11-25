@@ -80,6 +80,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FSoftClassPath> SoldierInfoList;
 
+// ---------------------------------- UI ---------------------------
+public:
 	// UI 总配置，UI 唯一id，对应UI路径
 	UPROPERTY(EditAnywhere, Category = UIConfig)
 	TMap<FString, FSoftClassPath> UIMap;
@@ -88,7 +90,11 @@ public:
 	UPROPERTY(EditAnywhere, Category=UIConfig)
 	FString DefaultUI;
 
+	// 游戏开始 UI（用于开始运行整个游戏）
+	UPROPERTY(EditAnywhere, Category = UIConfig)
+	FString GamePlayUI;
+
 	// 血条 UI 控件
-	UPROPERTY(EditAnywhere, Category=UIConfig)
-	FSoftClassPath HpBar_Path;
+	//UPROPERTY(EditAnywhere, Category=UIConfig)
+	//FSoftClassPath HpBar_Path;
 };

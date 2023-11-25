@@ -22,31 +22,6 @@ void AAIController_CloseCombat::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	AAICharacter_Base* AI_CloseCombat = Cast<AAICharacter_Base>(InPawn);
-
-	// 处理一下感知组件
-	if (SightConfig)
-	{
-		// 这一块的配置直接去 AI 上面取就行
-		if (AI_CloseCombat)
-		{
-			SightConfig->SightRadius = AI_CloseCombat->PerceptionRadius;
-			SightConfig->LoseSightRadius = AI_CloseCombat->LosePerceptionRadius;
-		}
-		else
-		{
-			SightConfig->SightRadius = 3000;
-			SightConfig->LoseSightRadius = 3500;
-		}
-
-		SightConfig->PeripheralVisionAngleDegrees = 180.f;
-		SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-	}
-	if (M_AIPerception)
-	{
-		M_AIPerception->ConfigureSense(*SightConfig);
-	}
-
 	if (AI_CloseCombat)
 	{
 		AI_CloseCombat->Init();
@@ -161,4 +136,34 @@ void AAIController_CloseCombat::FindTarget()
 	// 重置 IsPerception，以便 AI 可以巡逻
 	M_Blackboard->SetValueAsBool("IsPerception", false);
 }
+
+void AAIController_CloseCombat::InitAIPerception(APawn* InPawn)
+{
+	AAICharacter_Base* AI_CloseCombat = Cast<AAICharacter_Base>(InPawn);
+
+	// 处理一下感知组件
+	if (SightConfig)
+	{
+		// 这一块的配置直接去 AI 上面取就行
+		if (AI_CloseCombat)
+		{
+			SightConfig->SightRadius = AI_CloseCombat->PerceptionRadius;
+			SightConfig->LoseSightRadius = AI_CloseCombat->LosePerceptionRadius;
+		}
+		else
+		{
+			SightConfig->SightRadius = 3000;
+			SightConfig->LoseSightRadius = 3500;
+		}
+
+		SightConfig->PeripheralVisionAngleDegrees = 180.f;
+		SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+	}
+	if (M_AIPerception)
+	{
+		M_AIPerception->ConfigureSense(*SightConfig);
+	}
+}
+
 
