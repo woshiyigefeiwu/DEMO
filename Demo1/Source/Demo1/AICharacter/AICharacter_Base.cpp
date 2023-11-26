@@ -113,6 +113,28 @@ bool AAICharacter_Base::IsInAttackCD()
 	return GetWorldTimerManager().IsTimerActive(M_TimerHandle) == true;
 }
 
+bool AAICharacter_Base::IsCanApplyDamage(AActor* Target)
+{
+	// 能转换 且 不同阵营 才能 施加伤害
+	AAICharacter_Base* AI = Cast<AAICharacter_Base>(Target);
+	if(AI && AI->GetCampType() != this->GetCampType())
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+void AAICharacter_Base::ApplyDamageToAI(AActor* Target)
+{
+	AAICharacter_Base* AITarget = Cast<AAICharacter_Base>(Target);
+	AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
+	if (AITarget && AIC)
+	{
+		UGameplayStatics::ApplyDamage(AITarget, Atk, AIC, this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
+	}
+}
+
 //void AAICharacter_Base::InitHpUI()
 //{
 	//// 初始化一下 UI

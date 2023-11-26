@@ -128,6 +128,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AI_ApplyDamage(AAICharacter_Base* Enemy);
 
+	// 是否能对 Actor 造成伤害
+	UFUNCTION(BlueprintCallable)
+	bool IsCanApplyDamage(AActor* Target);
+
+	// 对 AI 造成伤害
+	UFUNCTION(BlueprintCallable)
+	void ApplyDamageToAI(AActor* Target);
+
 // ----------------------------------------- AI 的基础属性 --------------------------------------------
 public:
 	// 显示血条
