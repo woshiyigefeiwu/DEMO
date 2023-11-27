@@ -2,6 +2,7 @@
 
 
 #include "Skill_Base.h"
+#include "SkillComponent.h"
 
 // Sets default values
 ASkill_Base::ASkill_Base()
@@ -28,5 +29,14 @@ void ASkill_Base::Tick(float DeltaTime)
 void ASkill_Base::Init(USkillComponent* NewSkillComponent)
 {
 	SkillComponent = NewSkillComponent;
+}
+
+void ASkill_Base::ReleaseSkill()
+{
+	if (CanReleaseSkill())
+	{
+		ReduceConsume();
+		ExecuteSkill();
+	}
 }
 

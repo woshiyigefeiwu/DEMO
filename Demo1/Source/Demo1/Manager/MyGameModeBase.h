@@ -4,6 +4,7 @@
 
 #include "GeneralDataAsset.h"
 #include "UIManager.h"
+#include "SkillManager.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
@@ -30,6 +31,12 @@ public:
 	UGeneralDataAsset* GetGeneralDataAsset();
 
 	UFUNCTION()
+	void CreateSkillManager();
+
+	UFUNCTION()
+	ASkillManager* GetSkillManager();
+
+	UFUNCTION()
 	void PlayGame();
 
 public:
@@ -38,4 +45,10 @@ public:
 
 	UPROPERTY()
 	FOnPlayGame OnPlayGame;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataAssets")
+	FSoftClassPath SkillManagerClass;
+
+	UPROPERTY()
+	ASkillManager* SkillManager = nullptr;
 };

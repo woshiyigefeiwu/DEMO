@@ -2,8 +2,11 @@
 
 
 #include "SkillComponent.h"
-#include "Demo1/AICharacter/AICharacter_Base.h"
+#include "Demo1/Manager/SkillManager.h"
+#include "Demo1/Manager/MyGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "Skill_Base.h"
+#include "Demo1/AICharacter/AICharacter_Base.h"
 
 // Sets default values for this component's properties
 USkillComponent::USkillComponent()
@@ -39,25 +42,30 @@ void USkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void USkillComponent::CreateSkill()
 {
-	for (int i = 0; i < SkillList.Num(); i++)
+	AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(Owner));
+	if (GM && GM->GetSkillManager())
 	{
-		UClass* SkillClass = LoadSkillClass(SkillList[i]);
-		ASkill_Base* Skill = GetWorld()->SpawnActor<ASkill_Base>(SkillClass);
-
-		if (Skill)
+		ASkillManager* SkillManager = GM->GetSkillManager();
+		for (int i = 0; i < SkillConfig.Num(); i++)
 		{
-			Skill->Init(this);
+			ASkill_Base* Skill = SkillManager->CreateSkill(SkillConfig[i]);
+			if (Skill)
+			{
+				Skill->Init(this);
+				Skills.Add(SkillConfig[i], Skill);
+			}
 		}
 	}
 }
 
-UClass* USkillComponent::LoadSkillClass(FSoftClassPath SoftClassPath)
+void USkillComponent::ReleaseSkill(FString SkillId)
 {
-	FString Skill_Base_Path = "Blueprint'";
-	Skill_Base_Path.Append(SoftClassPath.ToString());
-	Skill_Base_Path.Append("'");
-	UClass* Skill_Base_Class = LoadClass<AActor>(NULL, *Skill_Base_Path);
-	return Skill_Base_Class;
+	if (Skills.Contains(SkillId))
+	{
+		ASkill_Base* Skill = Skills[SkillId];
+		if (Skill)
+		{
+			Skill->ReleaseSkill();
+		}
+	}
 }
-
-

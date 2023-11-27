@@ -20,12 +20,27 @@ AMyGameModeBase::AMyGameModeBase()
 
 void AMyGameModeBase::BeginPlay()
 {
-
+	CreateSkillManager();
 }
 
 UGeneralDataAsset* AMyGameModeBase::GetGeneralDataAsset()
 {
 	return GeneralDataAsset;
+}
+
+void AMyGameModeBase::CreateSkillManager()
+{
+	FString SkillManagerClassPath = "Blueprint'";
+	SkillManagerClassPath.Append(SkillManagerClass.ToString());
+	SkillManagerClassPath.Append("'");
+	UClass* SkillManagerUClass = LoadClass<ASkillManager>(NULL, *SkillManagerClassPath);
+	SkillManager = GetWorld()->SpawnActor<ASkillManager>(SkillManagerUClass);
+	//SkillManager = Cast<ASkillManager>(SkillManagerUClass->GetDefaultObject());
+}
+
+ASkillManager* AMyGameModeBase::GetSkillManager()
+{
+	return SkillManager;
 }
 
 void AMyGameModeBase::PlayGame()

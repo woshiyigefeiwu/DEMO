@@ -6,68 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SkillComponent.generated.h"
 
-// ------------------------------------------- 枚举 ---------------------------------------
-
-// 技能类型（这个更应该作为一种技能类型）
-UENUM(BlueprintType)
-enum class ESkillType : uint8
-{
-	NONE,
-	CloseCombatAttack		 = 1	UMETA(DisplayName = "近战攻击"),
-	LongRangeAttack			 = 2	UMETA(DisplayName = "远程攻击"),
-	ChangeAttributeValue	 = 3	UMETA(DisplayName = "改变属性值"),
-};
-
-// 触发条件类型
-UENUM(BlueprintType)
-enum class ETriggerCondition : uint8
-{
-	NONE,
-	LessThan		= 1		UMETA(DisplayName = "属性低于"),
-};
-
-// 触发消耗类型
-UENUM(BlueprintType)
-enum class ETriggerConsume : uint8
-{
-	NONE,
-	//SkillCD			= 1		UMETA(DisplayName = "技能CD"),
-};
-
-// 作用对象类型
-UENUM(BlueprintType)
-enum class EActionObject : uint8
-{
-	NONE,
-	SELF			= 1		UMETA(DisplayName = "Self"),
-};
-
-// 属性类型
-UENUM(BlueprintType)
-enum class EAttribute : uint8
-{
-	NONE,
-	HP				= 1		UMETA(DisplayName = "血量"),		// 对应血量变化
-	ATK				= 2		UMETA(DisplayName = "攻击力"),		// 对应攻击力变化
-};
-
-
-// ------------------------------------------- 结构体 ---------------------------------------
-
-USTRUCT(BlueprintType)
-struct FAttributeValue
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EAttribute Attribute;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Value;
-};
-
-// --------------------------------------------------------------------------------
-
+class ASkill_Base;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DEMO1_API USkillComponent : public UActorComponent
@@ -86,11 +25,17 @@ public:
 
 	void CreateSkill();
 
-	UClass* LoadSkillClass(FSoftClassPath SoftClassPath);
+	// 对外的释放技能接口
+	void ReleaseSkill(FString SkillId);
 
 public:	
+	// 当前组件配置的技能列表
 	UPROPERTY(EditAnywhere)
-	TArray<FSoftClassPath> SkillList;
+	TArray<FString> SkillConfig;
+
+	// 当前组件的技能
+	UPROPERTY()
+	TMap<FString, ASkill_Base*> Skills;
 
 private:
 	UPROPERTY()
