@@ -4,6 +4,7 @@
 
 #include "Demo1/Manager/GeneralDataAsset.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "Demo1/Skill/SkillComponent.h"
 
 #include "CoreMinimal.h"
 #include "Demo1/Demo1Character.h"
@@ -87,6 +88,10 @@ public:
 	// 获取显示的文本
 	UFUNCTION(BlueprintCallable)
 	FString GetDisplayStr() {return DisplayStr;}
+
+	// 设置技能组件
+	UFUNCTION()
+	void SetSkillComponent(USkillComponent* NewSkillComponent);
 
 // ------------------------------------------- 辅助函数 -----------------------------------
 public:
@@ -199,6 +204,9 @@ public:
 	// 当前兵种要显示的数据文本
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
 	FString DisplayStr;
+
+	UPROPERTY()
+	class USkillComponent* SkillComponent = nullptr;
 
 protected:
 	// 当前生命值

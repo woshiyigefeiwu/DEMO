@@ -7,7 +7,8 @@
 #include "Demo1/Manager/MyGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Demo1/Manager/MyGameModeBase.h"
-#include "Components//WidgetComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Demo1/Skill/SkillComponent.h"
 
 AAICharacter_Base::AAICharacter_Base()
 {
@@ -153,6 +154,11 @@ void AAICharacter_Base::ApplyDamageToAI(AActor* Target)
 //}
 
 // ------------------------------------------- ¸¨Öúº¯Êý -----------------------------------
+
+void AAICharacter_Base::SetSkillComponent(USkillComponent* NewSkillComponent)
+{
+	SkillComponent = NewSkillComponent;
+}
 
 void AAICharacter_Base::UpdateWalkSpeed()
 {
