@@ -154,12 +154,12 @@ public:
 	void ApplyDamageToAI(AActor* Target);
 
 	// 检查技能是否能释放
-	UFUNCTION(BlueprintCallable)
-	bool CanExecuteSkill(ESkillType SkillType, FString SkillId);
+	//UFUNCTION(BlueprintCallable)
+	//bool CanExecuteSkill(ESkillType SkillType, FString SkillId);
 
 	// 释放技能	
-	UFUNCTION(BlueprintCallable)
-	void ExecuteSkill(ESkillType SkillType, FString SkillId);
+	//UFUNCTION(BlueprintCallable)
+	//void ExecuteSkill(ESkillType SkillType, FString SkillId);
 
 
 // ----------------------------------------- AI 的基础属性 --------------------------------------------

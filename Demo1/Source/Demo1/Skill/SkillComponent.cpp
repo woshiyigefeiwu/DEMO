@@ -74,5 +74,5 @@ void USkillComponent::ExecuteSkill(ESkillType SkillType)
 
 bool USkillComponent::CanExecuteSkill(ESkillType SkillType)
 {
-	return 
+	return false;
 }

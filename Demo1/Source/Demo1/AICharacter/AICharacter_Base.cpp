@@ -136,15 +136,15 @@ void AAICharacter_Base::ApplyDamageToAI(AActor* Target)
 	}
 }
 
-bool AAICharacter_Base::CanExecuteSkill(ESkillType SkillType)
-{
-	if (SkillComponent)
-	{
-
-	}
-
-	return false;
-}
+//bool AAICharacter_Base::CanExecuteSkill(ESkillType SkillType)
+//{
+//	if (SkillComponent)
+//	{
+//
+//	}
+//
+//	return false;
+//}
 
 void AAICharacter_Base::SetSkillComponent(USkillComponent* NewSkillComponent)
 {
