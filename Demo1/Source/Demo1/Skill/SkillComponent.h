@@ -4,9 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "SkillConfig.h"
 #include "SkillComponent.generated.h"
 
 class ASkill_Base;
+
+
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DEMO1_API USkillComponent : public UActorComponent
@@ -26,20 +30,24 @@ public:
 	void CreateSkill();
 
 	// 对外的释放技能接口
-	void ReleaseSkill(FString SkillId);
+	void ExecuteSkill(ESkillType SkillType);
+
+	// 是否能释放技能
+	UFUNCTION(BlueprintCallable)
+	bool CanExecuteSkill(ESkillType SkillType);
 
 public:	
 	// 当前组件配置的技能列表
 	UPROPERTY(EditAnywhere)
-	TArray<FString> SkillConfig;
-
-	// 当前组件的技能
+	TMap<ESkillType, FArrayString_Node> SkillConfig;
+	
+	// 当前组件的技能逻辑
 	UPROPERTY()
-	TMap<FString, ASkill_Base*> Skills;
+	TMap<ESkillType, ASkill_Base*> Skills;
 
-private:
+public:
 	UPROPERTY()
-	AActor* Owner;
+	AActor* MyOwner;
 
 	
 };

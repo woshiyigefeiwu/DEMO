@@ -23,42 +23,27 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// 初始化
-	virtual void Init(class USkillComponent* NewSkillComponent);
+	virtual void Init(class USkillComponent* NewSkillComponent, ESkillType NewSkillType);
 
 // ------------------------ Skill Function----------------------------
 
 	// 释放当前的技能
-	virtual void ReleaseSkill();
+	virtual void PreExecuteSkill(FString SkilleId);
 
 	// 判断是否能释放技能
-	virtual bool CanReleaseSkill(){return false;}
+	virtual bool CanExecuteSkill(FString SkilleId){return false;}
 
 	// 扣除消耗
-	virtual void ReduceConsume(){}
+	virtual void ReduceConsume(FString SkilleId){}
 
 	// 技能执行
-	virtual void ExecuteSkill(){}
+	virtual void ExecuteSkill(FString SkilleId){}
 
 // ------------------------ Skill Property----------------------------
 public:	
 	// 当前技能对象在哪个技能组件上面
-	class USkillComponent* SkillComponent;
+	class USkillComponent* SkillComponent = nullptr;
 
-
-public:
-	// 触发条件类型
-	UPROPERTY(EditAnywhere, Category = "SkilleConfig|TriggerCondition")
-	ETriggerCondition TriggerCondition;
-
-	// 触发消耗类型
-	UPROPERTY(EditAnywhere, Category = "SkilleConfig|TriggerConsume")
-	ETriggerConsume TriggerConsume;
-
-	// 作用对象
-	UPROPERTY(EditAnywhere, Category = "SkilleConfig|ActionObject")
-	EActionObject ActionObject;
-
-	// 当前技能的类型（从外部赋一下值）
-	//UPROPERTY(BlueprintReadOnly, Category = "SkilleConfig")
-	//ESkillType SkillType;
+	// 当前技能的类型
+	ESkillType SkillType;
 };

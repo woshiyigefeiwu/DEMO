@@ -24,8 +24,8 @@ void USkillComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// 双向绑定一下
-	Owner = GetOwner();
-	AAICharacter_Base* AI = Cast<AAICharacter_Base>(Owner);
+	MyOwner = GetOwner();
+	AAICharacter_Base* AI = Cast<AAICharacter_Base>(MyOwner);
 	AI->SetSkillComponent(this);
 
 	// 创建技能
@@ -42,30 +42,37 @@ void USkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void USkillComponent::CreateSkill()
 {
-	AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(Owner));
+	AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(MyOwner));
 	if (GM && GM->GetSkillManager())
 	{
 		ASkillManager* SkillManager = GM->GetSkillManager();
-		for (int i = 0; i < SkillConfig.Num(); i++)
+
+		for (TMap<ESkillType, FArrayString_Node>::TConstIterator iter = SkillConfig.CreateConstIterator(); iter; ++iter)
 		{
-			ASkill_Base* Skill = SkillManager->CreateSkill(SkillConfig[i]);
+			ASkill_Base* Skill = SkillManager->CreateSkill(iter->Key);
 			if (Skill)
 			{
-				Skill->Init(this);
-				Skills.Add(SkillConfig[i], Skill);
+				Skill->Init(this, iter->Key);
+				Skills.Add(iter->Key, Skill);
 			}
 		}
 	}
 }
 
-void USkillComponent::ReleaseSkill(FString SkillId)
+void USkillComponent::ExecuteSkill(ESkillType SkillType)
 {
-	if (Skills.Contains(SkillId))
+	if (SkillConfig.Contains(SkillType) && Skills.Contains(SkillType))
 	{
-		ASkill_Base* Skill = Skills[SkillId];
-		if (Skill)
+		ASkill_Base* Skill = Skills[SkillType];
+		TArray<FString> SkillIdList = SkillConfig[SkillType].Array;
+		for (int i = 0; i < SkillIdList.Num(); i++)
 		{
-			Skill->ReleaseSkill();
+			Skill->PreExecuteSkill(SkillIdList[i]);
 		}
 	}
+}
+
+bool USkillComponent::CanExecuteSkill(ESkillType SkillType)
+{
+	return 
 }

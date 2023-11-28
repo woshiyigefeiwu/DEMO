@@ -4,10 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Demo1/Skill/SkillConfig.h"
 #include "SkillManager.generated.h"
 
 class ASkill_Base;
+class AAICharacter_Base;
 
+
+/*
 // ------------------------------------------- 枚举 ---------------------------------------
 
 // 技能类型（这个更应该作为一种技能类型）
@@ -47,11 +51,13 @@ enum class EActionObject : uint8
 
 // 属性类型
 UENUM(BlueprintType)
-enum class EAttribute : uint8
+enum class EAttributeType : uint8
 {
 	NONE,
-	HP = 1		UMETA(DisplayName = "HP"),		// 对应血量变化
-	ATK = 2		UMETA(DisplayName = "ATK"),		// 对应攻击力变化
+	HP			= 1		UMETA(DisplayName = "HP"),			// 对应血量变化
+	ATK			= 2		UMETA(DisplayName = "ATK"),			// 对应攻击力变化
+	AttachHP	= 3		UMETA(DisplayName = "AttachHP"),
+	AttachATK	= 4		UMETA(DisplayName = "AttachATK"),
 };
 
 
@@ -63,13 +69,14 @@ struct FAttributeValue
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EAttribute Attribute;
+	EAttributeType Attribute;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Value;
 };
 
 // --------------------------------------------------------------------------------
+*/
 
 UCLASS()
 class DEMO1_API ASkillManager : public AActor
@@ -87,13 +94,20 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	ASkill_Base* CreateSkill(FString SkillId);
+	ASkill_Base* CreateSkill(ESkillType SkillId);
 
 	UFUNCTION()
 	UClass* LoadSkillClass(FSoftClassPath SoftClassPath);
 
-public:	
-	// 每种技能对应一个技能id
-	UPROPERTY(EditAnywhere)
-	TMap<FString, FSoftClassPath> SkillIdConfig;
+	UFUNCTION()
+	USkillConfig* GetSkillConfig();
+
+	UFUNCTION()
+	float GetFloatAttributeValueByAttributeType(EAttributeType AttributeType, AAICharacter_Base* AI);
+
+	UFUNCTION()
+	void SetFloatAttributeValueByAttributeType(EAttributeType AttributeType, float Value, AAICharacter_Base* AI);
+
+	UFUNCTION()
+	FSkill_ChangeAttributeValue_Node GetSkill_ChangeAttributeValue_Node(ESkillType SkillType, FString SkilleId);
 };

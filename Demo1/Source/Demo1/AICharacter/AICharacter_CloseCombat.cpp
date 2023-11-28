@@ -17,3 +17,15 @@ void AAICharacter_CloseCombat::AttackEnemy(AAICharacter_Base* Enemy)
 	OnLaunchAttack.Broadcast();
 }
 
+float AAICharacter_CloseCombat::TakeDamage(float DamageTaken, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageTaken, DamageEvent, EventInstigator, DamageCauser);
+
+	if (SkillComponent)
+	{
+		SkillComponent->ExecuteSkill(ESkillType::ChangeAttributeValue);
+	}
+	
+	return 0.0f;
+}
+

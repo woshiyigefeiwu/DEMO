@@ -93,6 +93,18 @@ public:
 	UFUNCTION()
 	void SetSkillComponent(USkillComponent* NewSkillComponent);
 
+	// 设置当前附加hp
+	UFUNCTION()
+	void SetAttachCurrentHP(float AttachValue);
+
+	// 设置当前附加atk
+	void SetAttachAtk(float AttachValue);
+
+	// 
+	float GetAllCurrentHp();
+
+	float GetAllAtk();
+
 // ------------------------------------------- 辅助函数 -----------------------------------
 public:
 	// 更新一下 AI 的行走速度
@@ -130,8 +142,8 @@ public:
 	void EntryAttackCD();
 
 	// 施加伤害
-	UFUNCTION(BlueprintCallable)
-	void AI_ApplyDamage(AAICharacter_Base* Enemy);
+	//UFUNCTION(BlueprintCallable)
+	//void AI_ApplyDamage(AAICharacter_Base* Enemy);
 
 	// 是否能对 Actor 造成伤害
 	UFUNCTION(BlueprintCallable)
@@ -140,6 +152,15 @@ public:
 	// 对 AI 造成伤害
 	UFUNCTION(BlueprintCallable)
 	void ApplyDamageToAI(AActor* Target);
+
+	// 检查技能是否能释放
+	UFUNCTION(BlueprintCallable)
+	bool CanExecuteSkill(ESkillType SkillType, FString SkillId);
+
+	// 释放技能	
+	UFUNCTION(BlueprintCallable)
+	void ExecuteSkill(ESkillType SkillType, FString SkillId);
+
 
 // ----------------------------------------- AI 的基础属性 --------------------------------------------
 public:
@@ -221,6 +242,16 @@ protected:
 	UPROPERTY()
 	bool M_IsDead = false;
 	
+// --------------------------------------- 附加属性 --------------------------------------
+public:
+	// 附加属性，当前生命值
+	UPROPERTY()
+	float AttachCurrentHP;
+
+	// 附加属性，当前攻击力
+	UPROPERTY()
+	float AttachAtk;
+
 // --------------------------------------- AI 相关的数据 ----------------------------------
 private:
 	// 定时器，用于处理攻击CD

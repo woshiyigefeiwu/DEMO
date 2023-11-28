@@ -7,6 +7,7 @@
 #include "MyGameStateBase.h"
 #include "Demo1/Demo1Character.h"
 #include "Demo1/Demo1PlayerController.h"
+#include "Demo1/Skill/SkillConfig.h"
 
 AMyGameModeBase::AMyGameModeBase()
 {
@@ -26,6 +27,15 @@ void AMyGameModeBase::BeginPlay()
 UGeneralDataAsset* AMyGameModeBase::GetGeneralDataAsset()
 {
 	return GeneralDataAsset;
+}
+
+USkillConfig* AMyGameModeBase::GetSkillConfig()
+{
+	if (GeneralDataAsset)
+	{
+		return GeneralDataAsset->SkillConfig;
+	}
+	return nullptr;
 }
 
 void AMyGameModeBase::CreateSkillManager()

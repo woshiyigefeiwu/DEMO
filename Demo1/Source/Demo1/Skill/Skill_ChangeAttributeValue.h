@@ -11,16 +11,11 @@ class DEMO1_API ASkill_ChangeAttributeValue : public ASkill_Base
 {
 	GENERATED_BODY()
 
+// ------------------- Skill Function ----------------------------
 public:
-	// 触发的条件
-	UPROPERTY(EditAnywhere, Category = "SkilleConfig|TriggerCondition", meta = (EditCondition = "TriggerCondition == ETriggerCondition::LessThan", EditConditionHides))
-	FAttributeValue AttributeValue;
+	bool CanExecuteSkill(FString SkilleId) override;
 
-	// 消耗的属性
-	UPROPERTY(EditAnywhere, Category = "SkilleConfig|TriggerConsume", meta = (EditCondition = "TriggerConsume == ETriggerConsume::AttributeConsume", EditConditionHides))
-	TMap<EAttribute, float> ConsumeList;
+	void ExecuteSkill(FString SkilleId) override;
 
-	// 触发效果（属性附加值）
-	UPROPERTY(EditAnywhere, Category = "SkilleConfig|AttributeEffectList")
-	TMap<EAttribute, float> AttributeEffectList;
+	FSkill_ChangeAttributeValue_Node GetSkillConfigNode(FString SkilleId);
 };

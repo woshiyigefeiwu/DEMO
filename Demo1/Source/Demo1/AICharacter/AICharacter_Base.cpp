@@ -132,8 +132,43 @@ void AAICharacter_Base::ApplyDamageToAI(AActor* Target)
 	AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
 	if (AITarget && AIC)
 	{
-		UGameplayStatics::ApplyDamage(AITarget, Atk, AIC, this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
+		UGameplayStatics::ApplyDamage(AITarget, GetAllAtk(), AIC, this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
 	}
+}
+
+bool AAICharacter_Base::CanExecuteSkill(ESkillType SkillType)
+{
+	if (SkillComponent)
+	{
+
+	}
+
+	return false;
+}
+
+void AAICharacter_Base::SetSkillComponent(USkillComponent* NewSkillComponent)
+{
+	SkillComponent = NewSkillComponent;
+}
+
+void AAICharacter_Base::SetAttachCurrentHP(float AttachValue)
+{
+	AttachCurrentHP = AttachValue;
+}
+
+void AAICharacter_Base::SetAttachAtk(float AttachValue)
+{
+	AttachAtk = AttachValue;
+}
+
+float AAICharacter_Base::GetAllCurrentHp()
+{
+	return M_CurrentHP + AttachCurrentHP;
+}
+
+float AAICharacter_Base::GetAllAtk()
+{
+	return Atk + AttachAtk;
 }
 
 //void AAICharacter_Base::InitHpUI()
@@ -154,11 +189,6 @@ void AAICharacter_Base::ApplyDamageToAI(AActor* Target)
 //}
 
 // ------------------------------------------- ¸¨Öúº¯Êý -----------------------------------
-
-void AAICharacter_Base::SetSkillComponent(USkillComponent* NewSkillComponent)
-{
-	SkillComponent = NewSkillComponent;
-}
 
 void AAICharacter_Base::UpdateWalkSpeed()
 {
@@ -238,15 +268,15 @@ void AAICharacter_Base::FindTarget()
 	AIC->FindTarget();
 }
 
-void AAICharacter_Base::AI_ApplyDamage(AAICharacter_Base* Enemy)
-{
-	AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
-	if (AIC) 
-	{
-		if (Enemy && AIC->GetDistanceFromEnemy() <= AttackRadius)
-		{
-			UGameplayStatics::ApplyDamage(Enemy, Atk, AIC, this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
-			//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is TryApplyDamage() succeed !!!£¨CloseCombat£©");
-		}
-	}
-}
+//void AAICharacter_Base::AI_ApplyDamage(AAICharacter_Base* Enemy)
+//{
+	//AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
+	//if (AIC) 
+	//{
+	//	if (Enemy && AIC->GetDistanceFromEnemy() <= AttackRadius)
+	//	{
+	//		UGameplayStatics::ApplyDamage(Enemy, Atk, AIC, this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
+	//		//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is TryApplyDamage() succeed !!!£¨CloseCombat£©");
+	//	}
+	//}
+//}

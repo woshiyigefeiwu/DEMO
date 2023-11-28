@@ -133,19 +133,19 @@ void AProjectile::Init(AAICharacter_Base* OwnerCharacter)
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnOverlayBegin);
 }
 
-void AProjectile::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	// 对面死亡，或者同一阵营则跳过
-	AAICharacter_Base* HitAI = Cast<AAICharacter_Base>(OtherActor);
-	if (HitAI == nullptr || HitAI->IsDead() || HitAI->GetCampType() == M_OwnerCampType)
-	{
-		return;
-	}
-
-	UGameplayStatics::ApplyPointDamage(OtherActor, M_Damage, NormalImpulse, Hit, GetInstigator()->Controller, this, DamageType);
-
-	Destroy();
-}
+//void AProjectile::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+//{
+//	// 对面死亡，或者同一阵营则跳过
+//	AAICharacter_Base* HitAI = Cast<AAICharacter_Base>(OtherActor);
+//	if (HitAI == nullptr || HitAI->IsDead() || HitAI->GetCampType() == M_OwnerCampType)
+//	{
+//		return;
+//	}
+//
+//	UGameplayStatics::ApplyPointDamage(OtherActor, M_Damage, NormalImpulse, Hit, GetInstigator()->Controller, this, DamageType);
+//
+//	Destroy();
+//}
 
 void AProjectile::PlayEffect()
 {

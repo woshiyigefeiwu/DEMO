@@ -26,17 +26,18 @@ void ASkill_Base::Tick(float DeltaTime)
 
 }
 
-void ASkill_Base::Init(USkillComponent* NewSkillComponent)
+void ASkill_Base::Init(USkillComponent* NewSkillComponent, ESkillType NewSkillType)
 {
 	SkillComponent = NewSkillComponent;
+	SkillType = NewSkillType;
 }
 
-void ASkill_Base::ReleaseSkill()
+void ASkill_Base::PreExecuteSkill(FString SkilleId)
 {
-	if (CanReleaseSkill())
+	if (CanExecuteSkill(SkilleId))
 	{
-		ReduceConsume();
-		ExecuteSkill();
+		ReduceConsume(SkilleId);
+		ExecuteSkill(SkilleId);
 	}
 }
 

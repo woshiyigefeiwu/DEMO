@@ -6,6 +6,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Demo1/Skill/SkillConfig.h"
 #include "GeneralDataAsset.generated.h"
 
 // -------------------------------------------- Enum -------------------------------------------
@@ -72,7 +73,6 @@ UCLASS()
 class DEMO1_API UGeneralDataAsset : public UDataAsset
 {
 	GENERATED_BODY()
-	
 public:
 	UPROPERTY(EditAnywhere)
 	TArray<FCampInfo> CampInfoList;
@@ -87,12 +87,16 @@ public:
 	TMap<FString, FSoftClassPath> UIMap;
 
 	// 默认打开的UI
-	UPROPERTY(EditAnywhere, Category=UIConfig)
+	UPROPERTY(EditAnywhere, Category = UIConfig)
 	FString DefaultUI;
 
 	// 游戏开始 UI（用于开始运行整个游戏）
 	UPROPERTY(EditAnywhere, Category = UIConfig)
 	FString GamePlayUI;
+
+// ---------------------------------- Skill Config --------------------
+	UPROPERTY(EditAnywhere, Category = SkillConfig)
+	USkillConfig* SkillConfig = nullptr;
 
 	// 血条 UI 控件
 	//UPROPERTY(EditAnywhere, Category=UIConfig)

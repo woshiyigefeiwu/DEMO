@@ -31,6 +31,9 @@ public:
 	UGeneralDataAsset* GetGeneralDataAsset();
 
 	UFUNCTION()
+	class USkillConfig* GetSkillConfig();
+
+	UFUNCTION()
 	void CreateSkillManager();
 
 	UFUNCTION()

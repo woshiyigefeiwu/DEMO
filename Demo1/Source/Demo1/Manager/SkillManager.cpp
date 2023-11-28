@@ -3,6 +3,9 @@
 
 #include "SkillManager.h"
 #include "Demo1/Skill/Skill_Base.h"
+#include "Demo1/AICharacter/AICharacter_Base.h"
+#include "MyGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASkillManager::ASkillManager()
@@ -26,15 +29,19 @@ void ASkillManager::Tick(float DeltaTime)
 
 }
 
-ASkill_Base* ASkillManager::CreateSkill(FString SkillId)
+ASkill_Base* ASkillManager::CreateSkill(ESkillType SkillId)
 {
-	if (SkillIdConfig.Contains(SkillId))
+	USkillConfig* SkillConfig = GetSkillConfig();
+	if (SkillConfig)
 	{
-		FSoftClassPath SoftClassPath = SkillIdConfig[SkillId];
-		UClass* SkillClass = LoadSkillClass(SoftClassPath);
-		ASkill_Base* Skill = GetWorld()->SpawnActor<ASkill_Base>(SkillClass);
+		if (SkillConfig->SkillLogicIdConfig.Contains(SkillId))
+		{
+			FSoftClassPath SoftClassPath = SkillConfig->SkillLogicIdConfig[SkillId];
+			UClass* SkillClass = LoadSkillClass(SoftClassPath);
+			ASkill_Base* Skill = GetWorld()->SpawnActor<ASkill_Base>(SkillClass);
 
-		return Skill;
+			return Skill;
+		}
 	}
 
 	return nullptr;
@@ -42,9 +49,66 @@ ASkill_Base* ASkillManager::CreateSkill(FString SkillId)
 
 UClass* ASkillManager::LoadSkillClass(FSoftClassPath SoftClassPath)
 {
-	FString Skill_Base_Path = "Blueprint'";
-	Skill_Base_Path.Append(SoftClassPath.ToString());
-	Skill_Base_Path.Append("'");
+	//FString Skill_Base_Path = "Blueprint'";
+	//Skill_Base_Path.Append(SoftClassPath.ToString());
+	//Skill_Base_Path.Append("'");
+	FString Skill_Base_Path = SoftClassPath.ToString();
 	UClass* Skill_Base_Class = LoadClass<AActor>(NULL, *Skill_Base_Path);
 	return Skill_Base_Class;
+}
+
+USkillConfig* ASkillManager::GetSkillConfig()
+{
+	AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (GM && GM->GetGeneralDataAsset())
+	{
+		return GM->GetGeneralDataAsset()->SkillConfig;
+	}
+	return nullptr;
+}
+
+float ASkillManager::GetFloatAttributeValueByAttributeType(EAttributeType AttributeType, AAICharacter_Base* AI)
+{
+	if (AI)
+	{
+		if (AttributeType == EAttributeType::HP)
+		{
+			return AI->GetAllCurrentHp();
+		}
+		else if (AttributeType == EAttributeType::ATK)
+		{
+			return AI->GetAllAtk();
+		}
+	}
+
+	return 0.0f;
+}
+
+void ASkillManager::SetFloatAttributeValueByAttributeType(EAttributeType AttributeType, float Value, AAICharacter_Base* AI)
+{
+	if (AI)
+	{
+		if (AttributeType == EAttributeType::AttachHP)
+		{
+			AI->SetAttachCurrentHP(Value);
+		}
+		else if (AttributeType == EAttributeType::AttachATK)
+		{
+			AI->SetAttachAtk(Value);
+		}
+	}
+}
+
+FSkill_ChangeAttributeValue_Node ASkillManager::GetSkill_ChangeAttributeValue_Node(ESkillType SkillType, FString SkilleId)
+{
+	USkillConfig* SkillConfig = GetSkillConfig();
+	if (SkillConfig && SkillType == ESkillType::ChangeAttributeValue)
+	{
+		if (SkillConfig->Skill_ChangeAttributeValue_List.Contains(SkilleId))
+		{
+			return SkillConfig->Skill_ChangeAttributeValue_List[SkilleId];
+		}
+	}
+
+	return FSkill_ChangeAttributeValue_Node();
 }
