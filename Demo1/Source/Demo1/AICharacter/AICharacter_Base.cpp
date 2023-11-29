@@ -9,6 +9,7 @@
 #include "Demo1/Manager/MyGameModeBase.h"
 #include "Components/WidgetComponent.h"
 #include "Demo1/Skill/SkillComponent.h"
+#include "Demo1/Skill/SkillConfig.h"
 
 AAICharacter_Base::AAICharacter_Base()
 {
@@ -274,7 +275,8 @@ float AAICharacter_Base::GetTotalCurrentHp()
 	float TotalCurrentHp = M_CurrentHP;
 	if (SkillComponent)
 	{
-		TotalCurrentHp += SkillComponent->GetTotalAttachHp();
+		//TotalCurrentHp += SkillComponent->GetTotalAttachHp();
+		TotalCurrentHp += SkillComponent->GetTotalSkillAttributeValueByEAttributeType(EAttributeType::AttachHP);
 	}
 
 	return TotalCurrentHp;
@@ -285,7 +287,8 @@ float AAICharacter_Base::GetTotalAtk()
 	float TotalAtk = Atk;
 	if (SkillComponent)
 	{
-		TotalAtk += SkillComponent->GetTotalAttachAtk();
+		//TotalAtk += SkillComponent->GetTotalAttachAtk();
+		TotalAtk += SkillComponent->GetTotalSkillAttributeValueByEAttributeType(EAttributeType::AttachATK);
 	}
 
 	return TotalAtk;

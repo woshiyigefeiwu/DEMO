@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-//#include "SkillConfig.h"
+#include "SkillConfig.h"
 #include "SkillComponent.generated.h"
 
 class ASkill_Base;
@@ -23,6 +23,9 @@ struct FSkill_State_Node
 
 	// 附加的攻击力
 	float AttachAtk = 0.0f;
+
+	// 每个属性可以对应自己的附加值
+	TMap<EAttributeType, float> SkillAttributeValueList;
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -71,16 +74,16 @@ public:
 // ---------------------------------- 属性表相关操作 -----------------------------------------
 public:
 	// 获取对应的技能的附加hp属性
-	float GetAttachHp(FString SkillId);
+	//float GetAttachHp(FString SkillId);
 
 	// 设置对应技能的附加hp属性
-	void SetAttachHp(FString SkillId, float Value);
+	//void SetAttachHp(FString SkillId, float Value);
 
 	// 获取对应的技能的附加atk属性
-	float GetAttachAtk(FString SkillId);
+	//float GetAttachAtk(FString SkillId);
 
 	// 设置对应技能的附加atk属性
-	void SetAttachAtk(FString SkillId, float Value);
+	//void SetAttachAtk(FString SkillId, float Value);
 
 	// 获取上次释放技能的时间点
 	double GetLastReleaseSkillTime(FString SkillId);
@@ -89,10 +92,18 @@ public:
 	void SetLastReleaseSkillTime(FString SkillId, float Value);
 
 	// 获取所有技能的附加hp
-	float GetTotalAttachHp();
+	//float GetTotalAttachHp();
 	
 	// 获取所有技能的附加atk
-	float GetTotalAttachAtk();
+	//float GetTotalAttachAtk();
+
+	// ---
+	float GetSkillAttributeValueByEAttributeType(FString SkillId, EAttributeType AttributeType);
+
+	void SetSkillAttributeValueByEAttributeType(FString SkillId, EAttributeType AttributeType, float Value);
+
+	float GetTotalSkillAttributeValueByEAttributeType(EAttributeType AttributeType);
+
 
 // -------------------------------------------------------------------------------------
 public:	

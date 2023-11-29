@@ -15,15 +15,25 @@ void ASkill_ChangeAttributeValue::ExecuteSkill()
 
 		for (TMap<EAttributeType, float>::TConstIterator it = AdditionalAttributeList.CreateConstIterator(); it; ++it)
 		{
-			if (it->Key == EAttributeType::AttachATK)		// 附加攻击力
-			{
-				SkillComponent->SetAttachAtk(SkillId, it->Value);
-			}
-			else if (it->Key == EAttributeType::AttachHP)	// 附加血量（可以理解为护盾）
-			{
-				SkillComponent->SetAttachHp(SkillId, it->Value);
-			}
-			else if (it->Key == EAttributeType::HP)			// 直接增加当前血量
+			//if (it->Key == EAttributeType::AttachATK)		// 附加攻击力
+			//{
+			//	SkillComponent->SetAttachAtk(SkillId, it->Value);
+			//}
+			//else if (it->Key == EAttributeType::AttachHP)	// 附加血量（可以理解为护盾）
+			//{
+			//	SkillComponent->SetAttachHp(SkillId, it->Value);
+			//}
+			//else if (it->Key == EAttributeType::HP)			// 直接增加当前血量
+			//{
+			//	AAICharacter_Base* AI = Cast<AAICharacter_Base>(SkillComponent->MyOwner);
+			//	if (AI)
+			//	{
+			//		float CurrentHp = AI->GetCurrentHp();
+			//		AI->SetCurrentHP(CurrentHp + it->Value);
+			//	}
+			//}
+
+			if (it->Key == EAttributeType::HP)			// 直接增加当前血量
 			{
 				AAICharacter_Base* AI = Cast<AAICharacter_Base>(SkillComponent->MyOwner);
 				if (AI)
@@ -31,6 +41,10 @@ void ASkill_ChangeAttributeValue::ExecuteSkill()
 					float CurrentHp = AI->GetCurrentHp();
 					AI->SetCurrentHP(CurrentHp + it->Value);
 				}
+			}
+			else
+			{
+				SkillComponent->SetSkillAttributeValueByEAttributeType(SkillId, it->Key, it->Value);
 			}
 		}
 
