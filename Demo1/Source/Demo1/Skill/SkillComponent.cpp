@@ -17,7 +17,6 @@ USkillComponent::USkillComponent()
 	
 }
 
-
 // Called when the game starts
 void USkillComponent::BeginPlay()
 {
@@ -28,8 +27,8 @@ void USkillComponent::BeginPlay()
 	AAICharacter_Base* AI = Cast<AAICharacter_Base>(MyOwner);
 	AI->SetSkillComponent(this);
 
-	// 创建技能
-	CreateSkill();
+	// 初始化一下技能表
+	InitSkillStateList();
 }
 
 // Called every frame
@@ -40,39 +39,224 @@ void USkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// ...
 }
 
-void USkillComponent::CreateSkill()
+ASkillManager* USkillComponent::GetSkillManager()
 {
 	AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(MyOwner));
-	if (GM && GM->GetSkillManager())
+	if (GM)
 	{
-		ASkillManager* SkillManager = GM->GetSkillManager();
+		return GM->GetSkillManager();
+	}
 
-		for (TMap<ESkillType, FArrayString_Node>::TConstIterator iter = SkillConfig.CreateConstIterator(); iter; ++iter)
+	return nullptr;
+}
+
+void USkillComponent::InitSkillStateList()
+{
+	ASkillManager* SkillManager = GetSkillManager();
+
+	if (SkillManager)
+	{
+		for (int i = 0; i < SkillList.Num(); i++)
 		{
-			ASkill_Base* Skill = SkillManager->CreateSkill(iter->Key);
-			if (Skill)
+			if (SkillManager->IsInSkillConfigList(SkillList[i]))		// 合法技能
 			{
-				Skill->Init(this, iter->Key);
-				Skills.Add(iter->Key, Skill);
+				FSkill_State_Node SkillState;
+				SkillStateList.Add(SkillList[i], SkillState);
 			}
 		}
 	}
 }
 
-void USkillComponent::ExecuteSkill(ESkillType SkillType)
+bool USkillComponent::RunExecuteSkill(FString SkillId)
 {
-	if (SkillConfig.Contains(SkillType) && Skills.Contains(SkillType))
+	if (CanExecuteSkill(SkillId))
 	{
-		ASkill_Base* Skill = Skills[SkillType];
-		TArray<FString> SkillIdList = SkillConfig[SkillType].Array;
-		for (int i = 0; i < SkillIdList.Num(); i++)
+		ReduceSkillConsume(SkillId);
+		ExecuteSkill(SkillId);
+		return true;
+	}
+	return false;
+}
+
+bool USkillComponent::CanExecuteSkill(FString SkillId)
+{
+	ASkillManager* SkillManager = GetSkillManager();
+	if (SkillManager)
+	{
+		// 没有配 || 技能表里面没有
+		if (SkillList.Contains(SkillId) == false || SkillManager->IsInSkillConfigList(SkillId) == false)
 		{
-			Skill->PreExecuteSkill(SkillIdList[i]);
+			return false;
+		}
+
+		// 检查触发条件
+		if (SkillManager->CheckTriggerCondition(SkillId, MyOwner) == false)
+		{
+			return false;
+		}
+
+		// 检查CD
+		FSkill_Config_Node SkillConfigNode = SkillManager->GetSkillConfigNode(SkillId);
+		double SkillCD = SkillConfigNode.OtherConfig.SkillCD * 1000;
+		double CurrentTime = FDateTime::Now().GetTimeOfDay().GetTotalMilliseconds();
+		double LastTime = GetLastReleaseSkillTime(SkillId);
+		if (CurrentTime - LastTime < SkillCD)
+		{
+			return false;
+		}
+
+
+		UE_LOG(LogTemp, Error, TEXT("CurrentTime: %f"), CurrentTime);
+		UE_LOG(LogTemp, Error, TEXT("LastTime: %f"), LastTime);
+		UE_LOG(LogTemp, Error, TEXT("CD: %f"), SkillCD);
+
+		FDateTime tt = FDateTime::Now();
+		int year = tt.GetYear();
+		int month = tt.GetMonth();
+		int day = tt.GetDay();
+		int hour = tt.GetHour();
+		int minute = tt.GetMinute();
+		int second = tt.GetSecond();
+		UE_LOG(LogTemp, Error, TEXT("Time : %d, %d, %d, %d, %d, %d"), year, month, day, hour, minute, second);
+
+		/*
+			检查消耗
+
+			这里暂时没处理，应该是技能组件根据不同的消耗类型去做消耗判断；
+			比如 消耗蓝，那么可以由 AIManager 去检查消耗；
+			比如 金币，那么可以由 道具Manager 去检查消耗；
+		*/
+		FString SkillConsumeList = SkillManager->GetSkillConsumeList(SkillId);
+	}
+
+	return true;
+}
+
+void USkillComponent::ReduceSkillConsume(FString SkillId)
+{
+	ASkillManager* SkillManager = GetSkillManager();
+	if (SkillManager)
+	{
+		FString SkillConsumeList = SkillManager->GetSkillConsumeList(SkillId);
+		/*
+			扣除消耗
+
+			这里暂时没处理，应该是技能组件根据不同的消耗类型去做消耗扣除；
+			比如 消耗蓝，那么可以由 AIManager 去扣除消耗；
+			比如 金币，那么可以由 道具Manager 去扣除消耗；
+		*/
+	}
+}
+
+void USkillComponent::ExecuteSkill(FString SkillId)
+{
+	ASkill_Base* SkillExecutor = nullptr;
+
+	if (SkillExecutorCache.Contains(SkillId))
+	{
+		SkillExecutor = SkillExecutorCache[SkillId];
+	}
+	// 没有再 根据配置创建一个技能执行体
+	else
+	{
+		ASkillManager* SkillManager = GetSkillManager();
+		if (SkillManager)
+		{
+			SkillExecutor = SkillManager->CreateSkillExecutor(SkillId);
+			if (SkillExecutor)
+			{
+				SkillExecutorCache.Add(SkillId, SkillExecutor);
+				SkillExecutor->Init(this, SkillId);
+			}
+		}
+	}
+
+	SkillExecutor->ExecuteSkill();
+}
+
+void USkillComponent::TryExecuteSkillWhenHp()
+{
+	ASkillManager* SkillManager = GetSkillManager();
+	for (int i = 0; i < SkillList.Num(); i++)
+	{
+		FSkill_Config_Node SkillConfigNode = SkillManager->GetSkillConfigNode(SkillList[i]);
+		if (SkillConfigNode.TriggerCondition.TriggerConditionAttributeValue.Attribute == EAttributeType::HP)
+		{
+			RunExecuteSkill(SkillList[i]);
 		}
 	}
 }
 
-bool USkillComponent::CanExecuteSkill(ESkillType SkillType)
+// ---------------------------------- 属性表相关操作 -----------------------------------------
+float USkillComponent::GetAttachHp(FString SkillId)
 {
-	return false;
+	if (SkillStateList.Contains(SkillId))
+	{
+		return SkillStateList[SkillId].AttachHp;
+	}
+	return 0.0f;
+}
+
+void USkillComponent::SetAttachHp(FString SkillId, float Value)
+{
+	if (SkillStateList.Contains(SkillId))
+	{
+		SkillStateList[SkillId].AttachHp = Value;
+	}
+}
+
+float USkillComponent::GetAttachAtk(FString SkillId)
+{
+	if (SkillStateList.Contains(SkillId))
+	{
+		return SkillStateList[SkillId].AttachAtk;
+	}
+	return 0.0f;
+}
+
+void USkillComponent::SetAttachAtk(FString SkillId, float Value)
+{
+	if (SkillStateList.Contains(SkillId))
+	{
+		SkillStateList[SkillId].AttachAtk = Value;
+	}
+}
+
+double USkillComponent::GetLastReleaseSkillTime(FString SkillId)
+{
+	if (SkillStateList.Contains(SkillId))
+	{
+		return SkillStateList[SkillId].LastReleaseSkillTime;
+	}
+	return 0.0f;
+}
+
+void USkillComponent::SetLastReleaseSkillTime(FString SkillId, float Value)
+{
+	if (SkillStateList.Contains(SkillId))
+	{
+		SkillStateList[SkillId].LastReleaseSkillTime = Value;
+	}
+}
+
+float USkillComponent::GetTotalAttachHp()
+{
+	float TotalAttachHp = 0.0f;
+	for (TMap<FString, FSkill_State_Node>::TConstIterator iter = SkillStateList.CreateConstIterator(); iter; ++iter)
+	{
+		TotalAttachHp += iter->Value.AttachHp;
+	}
+
+	return TotalAttachHp;
+}
+
+float USkillComponent::GetTotalAttachAtk()
+{
+	float TotalAttachAtk = 0.0f;
+	for (TMap<FString, FSkill_State_Node>::TConstIterator iter = SkillStateList.CreateConstIterator(); iter; ++iter)
+	{
+		TotalAttachAtk += iter->Value.AttachAtk;
+	}
+
+	return TotalAttachAtk;
 }

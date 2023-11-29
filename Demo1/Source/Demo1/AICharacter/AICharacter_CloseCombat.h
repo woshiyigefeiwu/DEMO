@@ -19,7 +19,4 @@ public:
 
 	// 发起攻击
 	void AttackEnemy(AAICharacter_Base* Enemy) override;
-
-	// 受到攻击（从APawn覆盖）
-	float TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };

@@ -29,32 +29,70 @@ void ASkillManager::Tick(float DeltaTime)
 
 }
 
-ASkill_Base* ASkillManager::CreateSkill(ESkillType SkillId)
+//float ASkillManager::GetFloatAttributeValueByAttributeType(EAttributeType AttributeType, AAICharacter_Base* AI)
+//{
+//	if (AI)
+//	{
+//		if (AttributeType == EAttributeType::HP)
+//		{
+//			return AI->GetAllCurrentHp();
+//		}
+//		else if (AttributeType == EAttributeType::ATK)
+//		{
+//			return AI->GetAllAtk();
+//		}
+//	}
+//
+//	return 0.0f;
+//}
+//
+//void ASkillManager::SetFloatAttributeValueByAttributeType(EAttributeType AttributeType, float Value, AAICharacter_Base* AI)
+//{
+//	if (AI)
+//	{
+//		if (AttributeType == EAttributeType::AttachHP)
+//		{
+//			AI->SetAttachCurrentHP(Value);
+//		}
+//		else if (AttributeType == EAttributeType::AttachATK)
+//		{
+//			AI->SetAttachAtk(Value);
+//		}
+//	}
+//}
+//
+//FSkill_ChangeAttributeValue_Node ASkillManager::GetSkill_ChangeAttributeValue_Node(ESkillType SkillType, FString SkilleId)
+//{
+//	USkillConfig* SkillConfig = GetSkillConfig();
+//	if (SkillConfig && SkillType == ESkillType::ChangeAttributeValue)
+//	{
+//		if (SkillConfig->Skill_ChangeAttributeValue_List.Contains(SkilleId))
+//		{
+//			return SkillConfig->Skill_ChangeAttributeValue_List[SkilleId];
+//		}
+//	}
+//
+//	return FSkill_ChangeAttributeValue_Node();
+//}
+
+// --------------------------- 下面是重写 -------------------------------
+
+UClass* ASkillManager::LoadSkillExecutorClass(FSoftClassPath SoftClassPath)
 {
-	USkillConfig* SkillConfig = GetSkillConfig();
-	if (SkillConfig)
-	{
-		if (SkillConfig->SkillLogicIdConfig.Contains(SkillId))
-		{
-			FSoftClassPath SoftClassPath = SkillConfig->SkillLogicIdConfig[SkillId];
-			UClass* SkillClass = LoadSkillClass(SoftClassPath);
-			ASkill_Base* Skill = GetWorld()->SpawnActor<ASkill_Base>(SkillClass);
-
-			return Skill;
-		}
-	}
-
-	return nullptr;
-}
-
-UClass* ASkillManager::LoadSkillClass(FSoftClassPath SoftClassPath)
-{
-	//FString Skill_Base_Path = "Blueprint'";
-	//Skill_Base_Path.Append(SoftClassPath.ToString());
-	//Skill_Base_Path.Append("'");
 	FString Skill_Base_Path = SoftClassPath.ToString();
 	UClass* Skill_Base_Class = LoadClass<AActor>(NULL, *Skill_Base_Path);
 	return Skill_Base_Class;
+}
+
+ASkill_Base* ASkillManager::CreateSkillExecutor(FString SkillId)
+{
+	FSkill_Config_Node SkillConfigNode = GetSkillConfigNode(SkillId);
+	FSoftClassPath ExecutorClassPath = SkillConfigNode.TriggerEffect.SkillEffectExecutor;
+
+	UClass* ExecutorClass = LoadSkillExecutorClass(ExecutorClassPath);
+	ASkill_Base* Skill = GetWorld()->SpawnActor<ASkill_Base>(ExecutorClass);
+
+	return Skill;
 }
 
 USkillConfig* ASkillManager::GetSkillConfig()
@@ -67,48 +105,99 @@ USkillConfig* ASkillManager::GetSkillConfig()
 	return nullptr;
 }
 
-float ASkillManager::GetFloatAttributeValueByAttributeType(EAttributeType AttributeType, AAICharacter_Base* AI)
+bool ASkillManager::IsInSkillConfigList(FString SkillId)
+{
+	USkillConfig* SkillConfig = GetSkillConfig();
+	if (SkillConfig)
+	{
+		return SkillConfig->SkillConfigList.Contains(SkillId);
+	}
+
+	return false;
+}
+
+FSkill_Config_Node ASkillManager::GetSkillConfigNode(FString SkillId)
+{
+	USkillConfig* SkillConfig = GetSkillConfig();
+	if (SkillConfig && SkillConfig->SkillConfigList.Contains(SkillId))
+	{
+		return SkillConfig->SkillConfigList[SkillId];
+	}
+
+	return FSkill_Config_Node();
+}
+
+FString ASkillManager::GetSkillConsumeList(FString SkillId)
+{
+	return FString();
+}
+
+bool ASkillManager::CheckTriggerCondition(FString SkillId, AActor* Actor)
+{
+	FSkill_Config_Condition_Node TriggerCondition = GetSkillConfigNode(SkillId).TriggerCondition;
+
+	// 根据不同的触发条件类型，做具体的判断
+	if (TriggerCondition.TriggerConditionType == ETriggerCondition::NONE)
+	{
+		return true;
+	}
+	else if (TriggerCondition.TriggerConditionType == ETriggerCondition::LessThan)
+	{
+		return CheckTriggerCondition_LessThan(TriggerCondition, Actor);
+	}
+	else if (TriggerCondition.TriggerConditionType == ETriggerCondition::GreaterThan)
+	{
+		return CheckTriggerCondition_GreaterThan(TriggerCondition, Actor);
+	}
+
+	return false;
+}
+
+bool ASkillManager::CheckTriggerCondition_LessThan(FSkill_Config_Condition_Node TriggerCondition, AActor* Actor)
+{
+	AAICharacter_Base* AI = Cast<AAICharacter_Base>(Actor);
+	if (AI)
+	{
+		float AIAttributeValue = GetValueByAttributeType(TriggerCondition.TriggerConditionAttributeValue.Attribute, AI);
+		return AIAttributeValue < TriggerCondition.TriggerConditionAttributeValue.Value;
+	}
+
+	return false;
+}
+
+bool ASkillManager::CheckTriggerCondition_GreaterThan(FSkill_Config_Condition_Node TriggerCondition, AActor* Actor)
+{
+	AAICharacter_Base* AI = Cast<AAICharacter_Base>(Actor);
+	if (AI)
+	{
+		float AIAttributeValue = GetValueByAttributeType(TriggerCondition.TriggerConditionAttributeValue.Attribute, AI);
+		return AIAttributeValue > TriggerCondition.TriggerConditionAttributeValue.Value;
+	}
+
+	return false;
+}
+
+float ASkillManager::GetValueByAttributeType(EAttributeType AttributeType, AAICharacter_Base* AI)
 {
 	if (AI)
 	{
 		if (AttributeType == EAttributeType::HP)
 		{
-			return AI->GetAllCurrentHp();
+			return AI->GetCurrentHp();
 		}
 		else if (AttributeType == EAttributeType::ATK)
 		{
-			return AI->GetAllAtk();
+			return AI->GetAtk();
+		}
+		else if (AttributeType == EAttributeType::TotalHp)
+		{
+			return AI->GetTotalCurrentHp();
+		}
+		else if (AttributeType == EAttributeType::TotalAtk)
+		{
+			return AI->GetTotalAtk();
 		}
 	}
 
 	return 0.0f;
-}
-
-void ASkillManager::SetFloatAttributeValueByAttributeType(EAttributeType AttributeType, float Value, AAICharacter_Base* AI)
-{
-	if (AI)
-	{
-		if (AttributeType == EAttributeType::AttachHP)
-		{
-			AI->SetAttachCurrentHP(Value);
-		}
-		else if (AttributeType == EAttributeType::AttachATK)
-		{
-			AI->SetAttachAtk(Value);
-		}
-	}
-}
-
-FSkill_ChangeAttributeValue_Node ASkillManager::GetSkill_ChangeAttributeValue_Node(ESkillType SkillType, FString SkilleId)
-{
-	USkillConfig* SkillConfig = GetSkillConfig();
-	if (SkillConfig && SkillType == ESkillType::ChangeAttributeValue)
-	{
-		if (SkillConfig->Skill_ChangeAttributeValue_List.Contains(SkilleId))
-		{
-			return SkillConfig->Skill_ChangeAttributeValue_List[SkilleId];
-		}
-	}
-
-	return FSkill_ChangeAttributeValue_Node();
 }

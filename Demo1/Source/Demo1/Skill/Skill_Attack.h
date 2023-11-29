@@ -4,26 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Skill_Base.h"
+#include "SkillConfig.h"
 #include "Skill_Attack.generated.h"
 
-/**
- * 
- */
+class AAICharacter_Base;
+
 UCLASS()
 class DEMO1_API ASkill_Attack : public ASkill_Base
 {
 	GENERATED_BODY()
 
-// ------------------- Skill Function ----------------------------
 public:
-	bool CanExecuteSkill(FString SkilleId) override;
+	void ExecuteSkill() override;
 
-	void ExecuteSkill(FString SkilleId) override;
+	FSkill_Config_Effect_Node GetSkillConfigEffectNode();
 
-	FSkill_Attack_Node GetSkillConfigNode(FString SkilleId);
-
-public:
-	// 定时器，用于处理攻击CD
-	UPROPERTY()
-	FTimerHandle AttackTimerHandle;
+	void StartFire(AAICharacter_Base* AI, FSoftClassPath ProjectileClass);
 };

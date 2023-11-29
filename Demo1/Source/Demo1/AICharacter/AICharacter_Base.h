@@ -13,7 +13,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAfterPossessed);		//
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLaunchAttack);		// 发起攻击
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTakeDamage);			// 受到伤害（刷一下 UI 等等）
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAIDead);			// 角色死亡
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAIDead);				// 角色死亡
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnChangeHp);			// 血量改变
 
 UCLASS()
 class DEMO1_API AAICharacter_Base : public ADemo1Character
@@ -93,18 +94,6 @@ public:
 	UFUNCTION()
 	void SetSkillComponent(USkillComponent* NewSkillComponent);
 
-	// 设置当前附加hp
-	UFUNCTION()
-	void SetAttachCurrentHP(float AttachValue);
-
-	// 设置当前附加atk
-	void SetAttachAtk(float AttachValue);
-
-	// 
-	float GetAllCurrentHp();
-
-	float GetAllAtk();
-
 // ------------------------------------------- 辅助函数 -----------------------------------
 public:
 	// 更新一下 AI 的行走速度
@@ -127,6 +116,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsInAttackCD();
 
+	// 尝试触发触发条件为hp的技能
+	UFUNCTION(BlueprintCallable)
+	void TryExecuteSkillWhenHp();
+
 // ---------------------------------------- AI Behavior 接口（BT 调用） ------------------------------------------------
 public:
 	// 发起攻击（派生类重写一下）
@@ -141,10 +134,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Base_AI_Behavior")
 	void EntryAttackCD();
 
-	// 施加伤害
-	//UFUNCTION(BlueprintCallable)
-	//void AI_ApplyDamage(AAICharacter_Base* Enemy);
-
 	// 是否能对 Actor 造成伤害
 	UFUNCTION(BlueprintCallable)
 	bool IsCanApplyDamage(AActor* Target);
@@ -153,21 +142,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyDamageToAI(AActor* Target);
 
-	// 检查技能是否能释放
-	//UFUNCTION(BlueprintCallable)
-	//bool CanExecuteSkill(ESkillType SkillType, FString SkillId);
-
-	// 释放技能	
-	//UFUNCTION(BlueprintCallable)
-	//void ExecuteSkill(ESkillType SkillType, FString SkillId);
-
-
 // ----------------------------------------- AI 的基础属性 --------------------------------------------
 public:
-	// 显示血条
-	//UPROPERTY(EditAnywhere, Category = WidgetComponent)
-	//class UWidgetComponent* WidgetComponent;
-
 	// 最大生命值
 	UPROPERTY(EditAnywhere, Category = "BaseConfig")
 	float MaxHP;
@@ -241,16 +217,6 @@ protected:
 	// 是否属于死亡状态
 	UPROPERTY()
 	bool M_IsDead = false;
-	
-// --------------------------------------- 附加属性 --------------------------------------
-public:
-	// 附加属性，当前生命值
-	UPROPERTY()
-	float AttachCurrentHP;
-
-	// 附加属性，当前攻击力
-	UPROPERTY()
-	float AttachAtk;
 
 // --------------------------------------- AI 相关的数据 ----------------------------------
 private:
@@ -278,4 +244,34 @@ public:
 	// 角色死亡
 	UPROPERTY(BlueprintAssignable)
 	FOnAIDead OnAIDead;
+
+	// 血量改变
+	UPROPERTY(BlueprintAssignable)
+	FOnChangeHp OnChangeHp;
+
+// --------------------------------------- Skill -------------------------------------
+public:
+	// 整个释放技能流程
+	UFUNCTION(BlueprintCallable)
+	bool RunExecuteSkill(FString SkillId);
+
+	// 判断是否能释放技能
+	//UFUNCTION(BlueprintCallable)
+	//bool CanExecuteSkill(FString SkillId);
+
+	// 扣除技能消耗
+	//UFUNCTION(BlueprintCallable)
+	//void ReduceSkillConsume(FString SkillId);
+	
+	// 执行技能
+	//UFUNCTION(BlueprintCallable)
+	//void ExecuteSkill(FString SkillId);
+
+	// 获取当前总的 Hp
+	UFUNCTION(BlueprintCallable)
+	float GetTotalCurrentHp();
+
+	// 获取当前总的 Atk
+	UFUNCTION(BlueprintCallable)
+	float GetTotalAtk();
 };

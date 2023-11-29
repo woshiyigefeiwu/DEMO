@@ -15,9 +15,6 @@ enum class ESkillType : uint8
 	NONE,
 	Attack					= 1		UMETA(DisplayName = "Attack"),
 	ChangeAttributeValue	= 2		UMETA(DisplayName = "ChangeAttributeValue"),
-
-	//CloseCombatAttack		= 1		UMETA(DisplayName = "CloseCombatAttack"),
-	//LongRangeAttack			= 2		UMETA(DisplayName = "LongRangeAttack"),
 };
 
 // 触发条件类型
@@ -26,6 +23,7 @@ enum class ETriggerCondition : uint8
 {
 	NONE,
 	LessThan				= 1		UMETA(DisplayName = "LessThan"),
+	GreaterThan				= 2		UMETA(DisplayName = "GreaterThan"),
 };
 
 // 触发消耗类型
@@ -54,19 +52,12 @@ enum class EAttributeType : uint8
 	ATK			= 2		UMETA(DisplayName = "ATK"),			// 对应攻击力变化
 	AttachHP	= 3		UMETA(DisplayName = "AttachHP"),
 	AttachATK	= 4		UMETA(DisplayName = "AttachATK"),
+	TotalHp		= 5		UMETA(DisplayName = "TotalHp"),
+	TotalAtk = 5		UMETA(DisplayName = "TotalAtk"),
 };
 
 
 // ------------------------------------------- 结构体 ---------------------------------------
-
-USTRUCT(BlueprintType)
-struct FArrayString_Node
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FString> Array;
-};
 
 USTRUCT(BlueprintType)
 struct FAttributeValue
@@ -80,64 +71,92 @@ struct FAttributeValue
 	float Value;
 };
 
-	// ------------------------------------- 附加属性技能的结构体（一个结构体实例代表一种技能）
+// 触发条件
 USTRUCT(BlueprintType)
-struct FSkill_ChangeAttributeValue_Node
+struct FSkill_Config_Condition_Node
 {
 	GENERATED_BODY()
 
 	// 触发条件类型
-	UPROPERTY(EditAnywhere)
-	ETriggerCondition TriggerCondition;
+	UPROPERTY(EditAnywhere, Category = "TriggerCondition")
+	ETriggerCondition TriggerConditionType;
 
-	UPROPERTY(EditAnywhere, meta = (EditCondition = "TriggerCondition == ETriggerCondition::LessThan", EditConditionHides))
-	FAttributeValue AttributeValue;
-
-	// 触发消耗类型
-	UPROPERTY(EditAnywhere)
-	ETriggerConsume TriggerConsume;
-
-	UPROPERTY(EditAnywhere, meta = (EditCondition = "TriggerConsume == ETriggerConsume::AttributeConsume", EditConditionHides))
-	TMap<EAttributeType, float> ConsumeList;
-	 
-	// 作用对象
-	UPROPERTY(EditAnywhere)
-	EActionObject ActionObject;
-
-	// 触发效果（属性附加值）
-	UPROPERTY(EditAnywhere)
-	TMap<EAttributeType, float> AttributeEffectList;
+	// 具体触发条件
+	UPROPERTY(EditAnywhere, Category = "TriggerCondition", meta = (EditCondition = "TriggerConditionType != ETriggerCondition::NONE", EditConditionHides))
+	FAttributeValue TriggerConditionAttributeValue;
 };
 
-	// ----------------------------------------------- 攻击的结构体 -----------------------------------------------------
+// 触发消耗
 USTRUCT(BlueprintType)
-struct FSkill_Attack_Node
+struct FSkill_Config_Consume_Node
 {
 	GENERATED_BODY()
 
-	// 触发条件类型
-	UPROPERTY(EditAnywhere)
-	ETriggerCondition TriggerCondition;
-
 	// 触发消耗类型
-	UPROPERTY(EditAnywhere)
-	ETriggerConsume TriggerConsume;
-	 
+	UPROPERTY(EditAnywhere, Category = "TriggerConsume")
+	ETriggerConsume TriggerConsumeType;
+};
+
+// 触发效果
+USTRUCT(BlueprintType)
+struct FSkill_Config_Effect_Node
+{
+	GENERATED_BODY()
+
+	// 触发效果执行体
+	UPROPERTY(EditAnywhere, Category = "SkillEffect")
+	FSoftClassPath SkillEffectExecutor;
+
+	// 触发效果 ------------------ 属性附加值
+	UPROPERTY(EditAnywhere, Category = "SkillEffect|AdditionalAttribute")
+	TMap<EAttributeType, float> AdditionalAttributeList;
+
+	// 触发效果 ------------------ 攻击
+
+	// 是否有发射物
+	UPROPERTY(EditAnywhere, Category = "SkillEffect|Attack")
+	bool IsHasProjectile;			
+
+	// 发射物的BP
+	UPROPERTY(EditAnywhere, Category = "SkillEffect|Attack", meta = (EditCondition = "IsHasProjectile", EditConditionHides))
+	FSoftClassPath ProjectileClassPath;
+};
+
+// 其他配置
+USTRUCT(BlueprintType)
+struct FSkill_Config_Other_Node
+{
+	GENERATED_BODY()
+
 	// 作用对象
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "OtherConfig")
 	EActionObject ActionObject;
 
 	// 技能CD
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "OtherConfig")
 	float SkillCD;
+};
 
-	// 是否有生成物
-	UPROPERTY(EditAnywhere)
-	bool IsProduct;
+USTRUCT(BlueprintType)
+struct FSkill_Config_Node
+{
+	GENERATED_BODY()
 
-	// 生成物的蓝图类
-	UPROPERTY(EditAnywhere, meta = (EditCondition = "IsProduct", EditConditionHides))
-	FSoftClassPath ProjectileClassPath;
+	// 触发条件
+	UPROPERTY(EditAnywhere, Category = TriggerCondition)
+	FSkill_Config_Condition_Node TriggerCondition;
+
+	// 触发消耗
+	UPROPERTY(EditAnywhere, Category = TriggerConsume)
+	FSkill_Config_Consume_Node TriggerConsume;
+
+	// 触发效果
+	UPROPERTY(EditAnywhere, Category = SkillEffect)
+	FSkill_Config_Effect_Node TriggerEffect;
+	
+	// 其他配置
+	UPROPERTY(EditAnywhere, Category = SkillEffect)
+	FSkill_Config_Other_Node OtherConfig;
 };
 
 // --------------------------------------------------------------------------------
@@ -148,16 +167,7 @@ class DEMO1_API USkillConfig : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	// 每种技能执行逻辑对应一个id（类型就是id）
-	UPROPERTY(EditAnywhere, Category = "SkillType")
-	TMap<ESkillType, FSoftClassPath> SkillLogicIdConfig;
-	
-	// 附加属性的技能
-	UPROPERTY(EditAnywhere, Category = "ChangeAttributeValue")
-	TMap<FString, FSkill_ChangeAttributeValue_Node> Skill_ChangeAttributeValue_List;
-
-	// 攻击技能
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TMap<FString, FSkill_Attack_Node> Skill_Attack_List;
-
+	// 每种技能对应一个结构体配置
+	UPROPERTY(EditAnywhere)
+	TMap<FString, FSkill_Config_Node> SkillConfigList;
 };

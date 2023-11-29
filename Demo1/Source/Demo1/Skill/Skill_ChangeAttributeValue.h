@@ -11,11 +11,9 @@ class DEMO1_API ASkill_ChangeAttributeValue : public ASkill_Base
 {
 	GENERATED_BODY()
 
-// ------------------- Skill Function ----------------------------
 public:
-	bool CanExecuteSkill(FString SkilleId) override;
+	void ExecuteSkill() override;
 
-	void ExecuteSkill(FString SkilleId) override;
-
-	FSkill_ChangeAttributeValue_Node GetSkillConfigNode(FString SkilleId);
+	// 辅助函数，获取一下自己需要的配置信息
+	TMap<EAttributeType, float> GetAdditionalAttributeList();
 };

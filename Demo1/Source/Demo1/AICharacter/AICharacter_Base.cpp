@@ -96,6 +96,7 @@ bool AAICharacter_Base::IsDead()
 float AAICharacter_Base::SetCurrentHP(float NewHP)
 {
 	M_CurrentHP = NewHP;
+	OnChangeHp.Broadcast();
 	return M_CurrentHP;
 }
 
@@ -112,6 +113,14 @@ float AAICharacter_Base::GetAtk()
 bool AAICharacter_Base::IsInAttackCD()
 {
 	return GetWorldTimerManager().IsTimerActive(M_TimerHandle) == true;
+}
+
+void AAICharacter_Base::TryExecuteSkillWhenHp()
+{
+	if (SkillComponent)
+	{
+		SkillComponent->TryExecuteSkillWhenHp();
+	}
 }
 
 bool AAICharacter_Base::IsCanApplyDamage(AActor* Target)
@@ -132,62 +141,14 @@ void AAICharacter_Base::ApplyDamageToAI(AActor* Target)
 	AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
 	if (AITarget && AIC)
 	{
-		UGameplayStatics::ApplyDamage(AITarget, GetAllAtk(), AIC, this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
+		UGameplayStatics::ApplyDamage(AITarget, GetTotalAtk(), AIC, this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
 	}
 }
-
-//bool AAICharacter_Base::CanExecuteSkill(ESkillType SkillType)
-//{
-//	if (SkillComponent)
-//	{
-//
-//	}
-//
-//	return false;
-//}
 
 void AAICharacter_Base::SetSkillComponent(USkillComponent* NewSkillComponent)
 {
 	SkillComponent = NewSkillComponent;
 }
-
-void AAICharacter_Base::SetAttachCurrentHP(float AttachValue)
-{
-	AttachCurrentHP = AttachValue;
-}
-
-void AAICharacter_Base::SetAttachAtk(float AttachValue)
-{
-	AttachAtk = AttachValue;
-}
-
-float AAICharacter_Base::GetAllCurrentHp()
-{
-	return M_CurrentHP + AttachCurrentHP;
-}
-
-float AAICharacter_Base::GetAllAtk()
-{
-	return Atk + AttachAtk;
-}
-
-//void AAICharacter_Base::InitHpUI()
-//{
-	//// 初始化一下 UI
-	//const AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(this));
-	//if (GM && GM->GeneralDataAsset)
-	//{
-	//	FString HpBarPath = "Blueprint'";
-	//	HpBarPath.Append(GM->GeneralDataAsset->HpBar_Path.ToString());
-	//	HpBarPath.Append("'");
-
-	//	UClass* HpBarClass = LoadClass<UUserWidget>(NULL, *HpBarPath);
-	//	WidgetComponent->SetWidgetClass(HpBarClass);
-	//}
-
-	//WidgetComponent->GetWidget();
-//}
-
 // ------------------------------------------- 辅助函数 -----------------------------------
 
 void AAICharacter_Base::UpdateWalkSpeed()
@@ -212,7 +173,9 @@ float AAICharacter_Base::TakeDamage(float DamageTaken, FDamageEvent const& Damag
 	}
 
 	OnTakeDamage.Broadcast();
-	//RefreshHpUI();
+
+	// 尝试触发所有触发条件为扣血的技能
+	TryExecuteSkillWhenHp();
 
 	return CurrentHP;
 }
@@ -268,15 +231,62 @@ void AAICharacter_Base::FindTarget()
 	AIC->FindTarget();
 }
 
-//void AAICharacter_Base::AI_ApplyDamage(AAICharacter_Base* Enemy)
+// -------------------------------------- Skill ------------------------------------
+
+bool AAICharacter_Base::RunExecuteSkill(FString SkillId)
+{
+	if (SkillComponent)
+	{
+		return SkillComponent->RunExecuteSkill(SkillId);
+	}
+
+	return false;
+}
+
+//bool AAICharacter_Base::CanExecuteSkill(FString SkillId)
 //{
-	//AAIController_Base* AIC = Cast<AAIController_Base>(GetController());
-	//if (AIC) 
-	//{
-	//	if (Enemy && AIC->GetDistanceFromEnemy() <= AttackRadius)
-	//	{
-	//		UGameplayStatics::ApplyDamage(Enemy, Atk, AIC, this, TSubclassOf<UDamageType>(UDamageType::StaticClass()));
-	//		//GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Red, "this is TryApplyDamage() succeed !!!（CloseCombat）");
-	//	}
-	//}
+//	if (SkillComponent)
+//	{
+//		return SkillComponent->CanExecuteSkill(SkillId);
+//	}
+//
+//	return false;
 //}
+//
+//void AAICharacter_Base::ReduceSkillConsume(FString SkillId)
+//{
+//	if (SkillComponent)
+//	{
+//		return SkillComponent->ReduceSkillConsume(SkillId);
+//	}
+//}
+//
+//void AAICharacter_Base::ExecuteSkill(FString SkillId)
+//{
+//	if (SkillComponent)
+//	{
+//		return SkillComponent->ExecuteSkill(SkillId);
+//	}
+//}
+
+float AAICharacter_Base::GetTotalCurrentHp()
+{
+	float TotalCurrentHp = M_CurrentHP;
+	if (SkillComponent)
+	{
+		TotalCurrentHp += SkillComponent->GetTotalAttachHp();
+	}
+
+	return TotalCurrentHp;
+}
+
+float AAICharacter_Base::GetTotalAtk()
+{
+	float TotalAtk = Atk;
+	if (SkillComponent)
+	{
+		TotalAtk += SkillComponent->GetTotalAttachAtk();
+	}
+
+	return TotalAtk;
+}

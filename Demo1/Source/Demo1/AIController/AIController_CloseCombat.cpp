@@ -77,6 +77,10 @@ void AAIController_CloseCombat::UpdateState()
 	{
 		M_TargetEnemy = nullptr;
 		UpdateBBV_Target();
+		if (M_TargetEnemy == nullptr)
+		{
+			FindTarget();
+		}
 
 		Set_IsInAttackRange(false);
 		UpdateBBV_IsInAttackRange();

@@ -23,27 +23,15 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// 初始化
-	virtual void Init(class USkillComponent* NewSkillComponent, ESkillType NewSkillType);
-
-// ------------------------ Skill Function----------------------------
-
-	// 释放当前的技能
-	virtual void PreExecuteSkill(FString SkilleId);
-
-	// 判断是否能释放技能
-	virtual bool CanExecuteSkill(FString SkilleId){return false;}
-
-	// 扣除消耗
-	virtual void ReduceConsume(FString SkilleId){}
+	virtual void Init(class USkillComponent* NewSkillComponent, FString SkillId);
 
 	// 技能执行
-	virtual void ExecuteSkill(FString SkilleId){}
+	virtual void ExecuteSkill(){}
 
-// ------------------------ Skill Property----------------------------
 public:	
-	// 当前技能对象在哪个技能组件上面
+	// 当前技能效果执行体在哪个技能组件上面
 	class USkillComponent* SkillComponent = nullptr;
 
-	// 当前技能的类型
-	ESkillType SkillType;
+	// 当前技能效果执行体属于哪个技能（便于修改属性表）
+	FString SkillId;
 };

@@ -6,61 +6,51 @@
 #include "Demo1/Manager/MyGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
-bool ASkill_ChangeAttributeValue::CanExecuteSkill(FString SkilleId)
+void ASkill_ChangeAttributeValue::ExecuteSkill()
 {
 	if (SkillComponent)
 	{
-		//FSkill_ChangeAttributeValue_Node Skill_ChangeAttributeValue_Node = ;
-		FAttributeValue AttributeValue = GetSkillConfigNode(SkilleId).AttributeValue;		// 具体条件
-		AAICharacter_Base* AI = Cast<AAICharacter_Base>(SkillComponent->MyOwner);
-		AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(this));
+		// 获取一下自己的配置信息
+		TMap<EAttributeType, float> AdditionalAttributeList = GetAdditionalAttributeList();
 
-		if (AI && GM && GM->GetSkillManager())
+		for (TMap<EAttributeType, float>::TConstIterator it = AdditionalAttributeList.CreateConstIterator(); it; ++it)
 		{
-			ASkillManager* SkillManager = GM->GetSkillManager();
-
-			if (SkillManager->GetFloatAttributeValueByAttributeType(AttributeValue.Attribute, AI) <= AttributeValue.Value)
+			if (it->Key == EAttributeType::AttachATK)		// 附加攻击力
 			{
-				return true;
+				SkillComponent->SetAttachAtk(SkillId, it->Value);
+			}
+			else if (it->Key == EAttributeType::AttachHP)	// 附加血量（可以理解为护盾）
+			{
+				SkillComponent->SetAttachHp(SkillId, it->Value);
+			}
+			else if (it->Key == EAttributeType::HP)			// 直接增加当前血量
+			{
+				AAICharacter_Base* AI = Cast<AAICharacter_Base>(SkillComponent->MyOwner);
+				if (AI)
+				{
+					float CurrentHp = AI->GetCurrentHp();
+					AI->SetCurrentHP(CurrentHp + it->Value);
+				}
 			}
 		}
-	}
 
-	return false;
+		// 记得设置一下释放技能时间
+		double CurrentTime = FDateTime::Now().GetTimeOfDay().GetTotalMilliseconds();
+		SkillComponent->SetLastReleaseSkillTime(SkillId, CurrentTime);
+	}
 }
 
-void ASkill_ChangeAttributeValue::ExecuteSkill(FString SkilleId)
+TMap<EAttributeType, float> ASkill_ChangeAttributeValue::GetAdditionalAttributeList()
 {
 	if (SkillComponent)
 	{
-		AAICharacter_Base* AI = Cast<AAICharacter_Base>(SkillComponent->MyOwner);
-		AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(this));
-		TMap<EAttributeType, float> AttributeEffectList = GetSkillConfigNode(SkilleId).AttributeEffectList;
-
-		if (AI && GM && GM->GetSkillManager())
+		ASkillManager* SkillManager = SkillComponent->GetSkillManager();
+		if (SkillManager)
 		{
-			ASkillManager* SkillManager = GM->GetSkillManager();
-
-			for (TMap<EAttributeType, float>::TConstIterator iter = AttributeEffectList.CreateConstIterator(); iter; ++iter)
-			{
-				SkillManager->SetFloatAttributeValueByAttributeType(iter->Key, iter->Value, AI);
-			}
-		}
-	}	
-}
-
-FSkill_ChangeAttributeValue_Node ASkill_ChangeAttributeValue::GetSkillConfigNode(FString SkilleId)
-{
-	if (SkillComponent)
-	{
-		AAICharacter_Base* AI = Cast<AAICharacter_Base>(SkillComponent->MyOwner);
-		AMyGameModeBase* GM = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(this));
-		if (AI && GM && GM->GetSkillManager())
-		{
-			ASkillManager* SkillManager = GM->GetSkillManager();
-			return SkillManager->GetSkill_ChangeAttributeValue_Node(SkillType, SkilleId);
+			FSkill_Config_Node SkillConfigNode = SkillManager->GetSkillConfigNode(SkillId);
+			TMap<EAttributeType, float> AdditionalAttributeList = SkillConfigNode.TriggerEffect.AdditionalAttributeList;
+			return AdditionalAttributeList;
 		}
 	}
-
-	return FSkill_ChangeAttributeValue_Node();
+	return TMap<EAttributeType, float>();
 }
