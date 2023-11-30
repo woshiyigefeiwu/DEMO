@@ -96,6 +96,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FString GetDisplayStrBySoliderType(ESoldierType SoldierType);
 
+	// 获取所有同阵营的AI
+	UFUNCTION(BlueprintCallable)
+	TArray<AAICharacter_Base*> GetFriends(ECampType CampType);
+
 public:
 	UPROPERTY()
 	FGameOverDelegate GameOverDelegate;

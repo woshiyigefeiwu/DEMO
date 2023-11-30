@@ -29,54 +29,6 @@ void ASkillManager::Tick(float DeltaTime)
 
 }
 
-//float ASkillManager::GetFloatAttributeValueByAttributeType(EAttributeType AttributeType, AAICharacter_Base* AI)
-//{
-//	if (AI)
-//	{
-//		if (AttributeType == EAttributeType::HP)
-//		{
-//			return AI->GetAllCurrentHp();
-//		}
-//		else if (AttributeType == EAttributeType::ATK)
-//		{
-//			return AI->GetAllAtk();
-//		}
-//	}
-//
-//	return 0.0f;
-//}
-//
-//void ASkillManager::SetFloatAttributeValueByAttributeType(EAttributeType AttributeType, float Value, AAICharacter_Base* AI)
-//{
-//	if (AI)
-//	{
-//		if (AttributeType == EAttributeType::AttachHP)
-//		{
-//			AI->SetAttachCurrentHP(Value);
-//		}
-//		else if (AttributeType == EAttributeType::AttachATK)
-//		{
-//			AI->SetAttachAtk(Value);
-//		}
-//	}
-//}
-//
-//FSkill_ChangeAttributeValue_Node ASkillManager::GetSkill_ChangeAttributeValue_Node(ESkillType SkillType, FString SkilleId)
-//{
-//	USkillConfig* SkillConfig = GetSkillConfig();
-//	if (SkillConfig && SkillType == ESkillType::ChangeAttributeValue)
-//	{
-//		if (SkillConfig->Skill_ChangeAttributeValue_List.Contains(SkilleId))
-//		{
-//			return SkillConfig->Skill_ChangeAttributeValue_List[SkilleId];
-//		}
-//	}
-//
-//	return FSkill_ChangeAttributeValue_Node();
-//}
-
-// --------------------------- 下面是重写 -------------------------------
-
 UClass* ASkillManager::LoadSkillExecutorClass(FSoftClassPath SoftClassPath)
 {
 	FString Skill_Base_Path = SoftClassPath.ToString();
@@ -159,6 +111,9 @@ bool ASkillManager::CheckTriggerCondition_LessThan(FSkill_Config_Condition_Node 
 	if (AI)
 	{
 		float AIAttributeValue = GetValueByAttributeType(TriggerCondition.TriggerConditionAttributeValue.Attribute, AI);
+		//UE_LOG(LogTemp, Error, TEXT("CurrentHp : %f"), AIAttributeValue);
+		//UE_LOG(LogTemp, Error, TEXT("ConditionHp : %f"), TriggerCondition.TriggerConditionAttributeValue.Value);
+		//UE_LOG(LogTemp, Error, TEXT("------------------"));
 		return AIAttributeValue < TriggerCondition.TriggerConditionAttributeValue.Value;
 	}
 

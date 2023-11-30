@@ -20,12 +20,6 @@ AAIController_CloseCombat::AAIController_CloseCombat()
 void AAIController_CloseCombat::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-
-	AAICharacter_Base* AI_CloseCombat = Cast<AAICharacter_Base>(InPawn);
-	if (AI_CloseCombat)
-	{
-		AI_CloseCombat->Init();
-	}
 }
 
 void AAIController_CloseCombat::BeginPlay()
@@ -75,15 +69,18 @@ void AAIController_CloseCombat::UpdateState()
 	// 不存在或者死亡，则设置一下 Target 为空，且重置攻击范围状态
 	else
 	{
-		M_TargetEnemy = nullptr;
-		UpdateBBV_Target();
-		if (M_TargetEnemy == nullptr)
+		if (M_TargetEnemy)
 		{
-			FindTarget();
-		}
+			M_TargetEnemy = nullptr;
+			UpdateBBV_Target();
+			if (M_TargetEnemy == nullptr)
+			{
+				FindTarget();
+			}
 
-		Set_IsInAttackRange(false);
-		UpdateBBV_IsInAttackRange();
+			Set_IsInAttackRange(false);
+			UpdateBBV_IsInAttackRange();
+		}
 	}
 }
 

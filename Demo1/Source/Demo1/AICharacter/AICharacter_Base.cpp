@@ -166,17 +166,17 @@ float AAICharacter_Base::TakeDamage(float DamageTaken, FDamageEvent const& Damag
 	if (CurrentHP > 0)
 	{
 		CurrentHP = SetCurrentHP(M_CurrentHP - DamageTaken);
+
+		if (!IsDead() && CurrentHP <= 0)
+		{
+			AIDead();
+		}
+
+		OnTakeDamage.Broadcast();
+
+		// 尝试触发所有触发条件为扣血的技能
+		TryExecuteSkillWhenHp();
 	}
-
-	if (CurrentHP <= 0)
-	{
-		AIDead();
-	}
-
-	OnTakeDamage.Broadcast();
-
-	// 尝试触发所有触发条件为扣血的技能
-	TryExecuteSkillWhenHp();
 
 	return CurrentHP;
 }
@@ -243,32 +243,6 @@ bool AAICharacter_Base::RunExecuteSkill(FString SkillId)
 
 	return false;
 }
-
-//bool AAICharacter_Base::CanExecuteSkill(FString SkillId)
-//{
-//	if (SkillComponent)
-//	{
-//		return SkillComponent->CanExecuteSkill(SkillId);
-//	}
-//
-//	return false;
-//}
-//
-//void AAICharacter_Base::ReduceSkillConsume(FString SkillId)
-//{
-//	if (SkillComponent)
-//	{
-//		return SkillComponent->ReduceSkillConsume(SkillId);
-//	}
-//}
-//
-//void AAICharacter_Base::ExecuteSkill(FString SkillId)
-//{
-//	if (SkillComponent)
-//	{
-//		return SkillComponent->ExecuteSkill(SkillId);
-//	}
-//}
 
 float AAICharacter_Base::GetTotalCurrentHp()
 {

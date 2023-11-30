@@ -171,7 +171,11 @@ void USkillComponent::ExecuteSkill(FString SkillId)
 
 	if (SkillExecutor)
 	{
-		SkillExecutor->ExecuteSkill();
+		// 收集一下属性 Map
+		TMap<FString,float> FloatMap = CollectFloatConfig(SkillId);
+		TMap<FString, FSoftClassPath> SoftClassPathMap = CollectSoftClassPathConfig(SkillId);
+
+		SkillExecutor->ExecuteSkill(this, FloatMap, SoftClassPathMap);
 	}
 }
 
@@ -188,40 +192,36 @@ void USkillComponent::TryExecuteSkillWhenHp()
 	}
 }
 
-// ---------------------------------- 属性表相关操作 -----------------------------------------
-//float USkillComponent::GetAttachHp(FString SkillId)
-//{
-//	if (SkillStateList.Contains(SkillId))
-//	{
-//		return SkillStateList[SkillId].AttachHp;
-//	}
-//	return 0.0f;
-//}
-//
-//void USkillComponent::SetAttachHp(FString SkillId, float Value)
-//{
-//	if (SkillStateList.Contains(SkillId))
-//	{
-//		SkillStateList[SkillId].AttachHp = Value;
-//	}
-//}
-//
-//float USkillComponent::GetAttachAtk(FString SkillId)
-//{
-//	if (SkillStateList.Contains(SkillId))
-//	{
-//		return SkillStateList[SkillId].AttachAtk;
-//	}
-//	return 0.0f;
-//}
-//
-//void USkillComponent::SetAttachAtk(FString SkillId, float Value)
-//{
-//	if (SkillStateList.Contains(SkillId))
-//	{
-//		SkillStateList[SkillId].AttachAtk = Value;
-//	}
-//}
+EAttributeType USkillComponent::GetAttributeType(float Value)
+{
+	int value = Value;
+	EAttributeType Result = EAttributeType::NONE;
+	switch (value)
+	{
+	case 1:
+		Result = EAttributeType::HP;
+		break;
+	case 2:
+		Result = EAttributeType::ATK;
+		break;
+	case 3:
+		Result = EAttributeType::AttachHP;
+		break;
+	case 4:
+		Result = EAttributeType::AttachATK;
+		break;
+	case 5:
+		Result = EAttributeType::TotalHp;
+		break;
+	case 6:
+		Result = EAttributeType::TotalAtk;
+		break;
+	default:
+		break;
+	}
+
+	return Result;
+}
 
 double USkillComponent::GetLastReleaseSkillTime(FString SkillId)
 {
@@ -239,30 +239,6 @@ void USkillComponent::SetLastReleaseSkillTime(FString SkillId, float Value)
 		SkillStateList[SkillId].LastReleaseSkillTime = Value;
 	}
 }
-
-//float USkillComponent::GetTotalAttachHp()
-//{
-//	float TotalAttachHp = 0.0f;
-//	for (TMap<FString, FSkill_State_Node>::TConstIterator iter = SkillStateList.CreateConstIterator(); iter; ++iter)
-//	{
-//		TotalAttachHp += iter->Value.AttachHp;
-//	}
-//
-//	return TotalAttachHp;
-//}
-//
-//float USkillComponent::GetTotalAttachAtk()
-//{
-//	float TotalAttachAtk = 0.0f;
-//	for (TMap<FString, FSkill_State_Node>::TConstIterator iter = SkillStateList.CreateConstIterator(); iter; ++iter)
-//	{
-//		TotalAttachAtk += iter->Value.AttachAtk;
-//	}
-//
-//	return TotalAttachAtk;
-//}
-
-// ----
 
 float USkillComponent::GetSkillAttributeValueByEAttributeType(FString SkillId, EAttributeType AttributeType)
 {
@@ -298,4 +274,59 @@ float USkillComponent::GetTotalSkillAttributeValueByEAttributeType(EAttributeTyp
 	}
 
 	return TotalValue;
+}
+
+TMap<FString, float> USkillComponent::CollectFloatConfig(FString SkillId)
+{
+	ASkillManager* SkillManager = GetSkillManager();
+	FSkill_Config_Node SkillConfig = SkillManager->GetSkillConfigNode(SkillId);
+	FSkill_Config_Effect_Node SkillConfigNode = SkillConfig.TriggerEffect;
+
+	TMap<FString, float> ResultMap;
+
+	// 收集 附加属性
+	for (TMap<EAttributeType, float>::TConstIterator iter = SkillConfigNode.AdditionalAttributeList.CreateConstIterator(); iter; ++iter)
+	{
+		UEnum* const CompileModeEnum = StaticEnum<EAttributeType>();
+		if (CompileModeEnum)
+		{
+			// 存一下 Key，属性
+			FString str = CompileModeEnum->GetDisplayNameTextByValue(static_cast<uint8>(iter->Key)).ToString();
+			FString s = "Attribute_";
+			s.Append(str);
+			ResultMap.Add(s, static_cast<float>(iter->Key));
+
+			// 存一下 Value，属性值
+			s.Append("_Value");
+			ResultMap.Add(s, iter->Value);
+		}
+	}
+
+	// 收集一下作用对象
+	UEnum* const CompileModeEnum = StaticEnum<EActionObject>();
+	if(CompileModeEnum)
+	{
+		FString ActionObjectStr = "Action_Object_";
+		FString str = CompileModeEnum->GetDisplayNameTextByValue(static_cast<uint8>(SkillConfig.OtherConfig.ActionObject)).ToString();
+		ActionObjectStr.Append(str);
+		ResultMap.Add(ActionObjectStr, static_cast<float>(SkillConfig.OtherConfig.ActionObject));
+	}
+
+	// 收集 攻击（是否有发射物）
+	FString s = "IsHasProjectile";
+	ResultMap.Add(s, SkillConfigNode.IsHasProjectile);
+
+	return ResultMap;
+}
+
+TMap<FString, FSoftClassPath> USkillComponent::CollectSoftClassPathConfig(FString SkillId)
+{
+	ASkillManager* SkillManager = GetSkillManager();
+	FSkill_Config_Effect_Node SkillConfigNode = SkillManager->GetSkillConfigNode(SkillId).TriggerEffect;
+	TMap<FString, FSoftClassPath> ResultMap;
+
+	FString s = "ProjectileClassPath";
+	ResultMap.Add(s, SkillConfigNode.ProjectileClassPath);
+
+	return ResultMap;
 }

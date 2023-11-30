@@ -15,9 +15,7 @@ class DEMO1_API ASkill_Attack : public ASkill_Base
 	GENERATED_BODY()
 
 public:
-	void ExecuteSkill() override;
-
-	FSkill_Config_Effect_Node GetSkillConfigEffectNode();
+	void ExecuteSkill(class USkillComponent* SkillComponent, TMap<FString, float> FloatMap, TMap<FString, FSoftClassPath> SoftClassPathMap) override;
 
 	void StartFire(AAICharacter_Base* AI, FSoftClassPath ProjectileClass);
 };

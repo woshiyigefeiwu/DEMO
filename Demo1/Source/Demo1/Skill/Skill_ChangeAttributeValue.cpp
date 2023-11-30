@@ -5,46 +5,70 @@
 #include "Demo1/AICharacter/AICharacter_Base.h"
 #include "Demo1/Manager/MyGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Demo1/Manager/MyGameStateBase.h"
 
-void ASkill_ChangeAttributeValue::ExecuteSkill()
+void ASkill_ChangeAttributeValue::ExecuteSkill(USkillComponent* SkillComponent, TMap<FString, float> FloatMap, TMap<FString, FSoftClassPath> SoftClassPathMap)
 {
 	if (SkillComponent)
 	{
-		// 获取一下自己的配置信息
-		TMap<EAttributeType, float> AdditionalAttributeList = GetAdditionalAttributeList();
-
-		for (TMap<EAttributeType, float>::TConstIterator it = AdditionalAttributeList.CreateConstIterator(); it; ++it)
+		for (TMap<FString, float>::TConstIterator it = FloatMap.CreateConstIterator(); it; ++it)
 		{
-			//if (it->Key == EAttributeType::AttachATK)		// 附加攻击力
-			//{
-			//	SkillComponent->SetAttachAtk(SkillId, it->Value);
-			//}
-			//else if (it->Key == EAttributeType::AttachHP)	// 附加血量（可以理解为护盾）
-			//{
-			//	SkillComponent->SetAttachHp(SkillId, it->Value);
-			//}
-			//else if (it->Key == EAttributeType::HP)			// 直接增加当前血量
-			//{
-			//	AAICharacter_Base* AI = Cast<AAICharacter_Base>(SkillComponent->MyOwner);
-			//	if (AI)
-			//	{
-			//		float CurrentHp = AI->GetCurrentHp();
-			//		AI->SetCurrentHP(CurrentHp + it->Value);
-			//	}
-			//}
-
-			if (it->Key == EAttributeType::HP)			// 直接增加当前血量
+			FString s = it->Key;
+			if (s == "Attribute_AttachATK")
 			{
-				AAICharacter_Base* AI = Cast<AAICharacter_Base>(SkillComponent->MyOwner);
-				if (AI)
+				float value = 0.0f;
+				if (FloatMap.Contains("Attribute_AttachATK_Value"))
 				{
-					float CurrentHp = AI->GetCurrentHp();
-					AI->SetCurrentHP(CurrentHp + it->Value);
+					value = FloatMap["Attribute_AttachATK_Value"];
 				}
+
+				EAttributeType AttributeType = SkillComponent->GetAttributeType(it->Value);
+				SkillComponent->SetSkillAttributeValueByEAttributeType(SkillId, AttributeType, value);
 			}
-			else
+			else if(s == "Attribute_HP")
 			{
-				SkillComponent->SetSkillAttributeValueByEAttributeType(SkillId, it->Key, it->Value);
+				float value = 0.0f;
+				if (FloatMap.Contains("Attribute_HP_Value"))
+				{
+					value = FloatMap["Attribute_HP_Value"];
+				}
+
+				AAICharacter_Base* AI = Cast<AAICharacter_Base>(SkillComponent->MyOwner);
+
+				// 作用对象是自友军
+				if (FloatMap.Contains("Action_Object_Friend"))
+				{
+					if (AI)
+					{
+						AMyGameStateBase* GS = Cast<AMyGameStateBase>(GetWorld()->GetGameState());
+						TArray<AAICharacter_Base*> Friends = GS->GetFriends(AI->GetCampType());
+						for (int i = 0; i < Friends.Num(); i++)
+						{
+							if (Friends[i])
+							{
+								float CurrentHp = Friends[i]->GetCurrentHp();
+								CurrentHp = Friends[i]->SetCurrentHP(CurrentHp + value);
+								if (CurrentHp > Friends[i]->GetMaxHp())
+								{
+									Friends[i]->SetMaxHp(CurrentHp);
+								}
+							}
+						}
+					}
+				}
+				// 作用对象是自己
+				else
+				{
+					if (AI)
+					{
+						float CurrentHp = AI->GetCurrentHp();
+						CurrentHp = AI->SetCurrentHP(CurrentHp + value);
+						if (CurrentHp > AI->GetMaxHp())
+						{
+							AI->SetMaxHp(CurrentHp);
+						}
+					}
+				}
 			}
 		}
 
@@ -52,19 +76,4 @@ void ASkill_ChangeAttributeValue::ExecuteSkill()
 		double CurrentTime = FDateTime::Now().GetTimeOfDay().GetTotalMilliseconds();
 		SkillComponent->SetLastReleaseSkillTime(SkillId, CurrentTime);
 	}
-}
-
-TMap<EAttributeType, float> ASkill_ChangeAttributeValue::GetAdditionalAttributeList()
-{
-	if (SkillComponent)
-	{
-		ASkillManager* SkillManager = SkillComponent->GetSkillManager();
-		if (SkillManager)
-		{
-			FSkill_Config_Node SkillConfigNode = SkillManager->GetSkillConfigNode(SkillId);
-			TMap<EAttributeType, float> AdditionalAttributeList = SkillConfigNode.TriggerEffect.AdditionalAttributeList;
-			return AdditionalAttributeList;
-		}
-	}
-	return TMap<EAttributeType, float>();
 }

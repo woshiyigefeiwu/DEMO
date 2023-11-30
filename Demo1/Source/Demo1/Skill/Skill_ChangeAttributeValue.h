@@ -6,14 +6,13 @@
 #include "Skill_Base.h"
 #include "Skill_ChangeAttributeValue.generated.h"
 
+class AAICharacter_Base;
+
 UCLASS()
 class DEMO1_API ASkill_ChangeAttributeValue : public ASkill_Base
 {
 	GENERATED_BODY()
 
 public:
-	void ExecuteSkill() override;
-
-	// 辅助函数，获取一下自己需要的配置信息
-	TMap<EAttributeType, float> GetAdditionalAttributeList();
+	void ExecuteSkill(class USkillComponent* SkillComponent, TMap<FString, float> FloatMap, TMap<FString, FSoftClassPath> SoftClassPathMap) override;
 };

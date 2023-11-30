@@ -7,6 +7,26 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController_Base.generated.h"
 
+
+	USTRUCT(BlueprintType)
+	struct FTempStruct
+	{
+		GENERATED_USTRUCT_BODY()
+
+	public:
+		UPROPERTY()
+		AAICharacter_Base* TempEnemy;
+
+		UPROPERTY()
+		float dis;		// 两者之间的距离
+
+		bool operator<(const FTempStruct& TempStructNode) const
+		{
+			//>是从大到小排序，<就是从小到大
+			return dis < TempStructNode.dis;
+		}
+	};
+
 /**
  * 
  */

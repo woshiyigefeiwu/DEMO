@@ -269,6 +269,26 @@ FString AMyGameStateBase::GetDisplayStrBySoliderType(ESoldierType SoldierType)
 	return FString();
 }
 
+TArray<AAICharacter_Base*> AMyGameStateBase::GetFriends(ECampType CampType)
+{
+	TArray<AAICharacter_Base*> AIArray;
+	if (M_AIList.Contains(CampType))
+	{
+		for (TMap<ESoldierType, FCamp_Solider_AIList>::TConstIterator it = M_AIList[CampType].Camp_AIList.CreateConstIterator(); it; ++it)
+		{
+			for (int i = 0; i < it->Value.Camp_Solider_AIList.Num(); i++)
+			{
+				AAICharacter_Base* AI = it->Value.Camp_Solider_AIList[i];
+				if (AI && !AI->IsDead())
+				{
+					AIArray.Add(AI);
+				}
+			}
+		}
+	}
+	return AIArray;
+}
+
 
 
 

@@ -26,11 +26,11 @@ public:
 	virtual void Init(class USkillComponent* NewSkillComponent, FString SkillId);
 
 	// 技能执行
-	virtual void ExecuteSkill(){}
+	virtual void ExecuteSkill(class USkillComponent* SkillComponent, TMap<FString, float> FloatMap, TMap<FString, FSoftClassPath> SoftClassPathMap){}
 
 public:	
 	// 当前技能效果执行体在哪个技能组件上面
-	class USkillComponent* SkillComponent = nullptr;
+	//class USkillComponent* SkillComponent = nullptr;
 
 	// 当前技能效果执行体属于哪个技能（便于修改属性表）
 	FString SkillId;

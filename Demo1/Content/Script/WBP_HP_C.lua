@@ -11,7 +11,7 @@ local WBP_HP = UnLua.Class()
 
 function WBP_HP:Construct()
     self:InitHp()
-    self.AI.OnTakeDamage:Add(self, self.RefreshHp)
+    self.AI.OnChangeHp:Add(self, self.RefreshHp)
 end
 
 function WBP_HP:InitHp()

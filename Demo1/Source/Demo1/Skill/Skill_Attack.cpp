@@ -6,7 +6,7 @@
 #include "Demo1/OtherObjects/Projectile.h"
 #include "Kismet/GameplayStatics.h"
 
-void ASkill_Attack::ExecuteSkill()
+void ASkill_Attack::ExecuteSkill(USkillComponent* SkillComponent, TMap<FString, float> FloatMap, TMap<FString, FSoftClassPath> SoftClassPathMap)
 {
 	if (SkillComponent)
 	{
@@ -15,11 +15,9 @@ void ASkill_Attack::ExecuteSkill()
 		{
 			AI->OnLaunchAttack.Broadcast();
 
-			// 看一下是否有发射物
-			FSkill_Config_Effect_Node SkillConfigEffectNode = GetSkillConfigEffectNode();
-			if (SkillConfigEffectNode.IsHasProjectile)
+			if (FloatMap.Contains("IsHasProjectile") && SoftClassPathMap.Contains("ProjectileClassPath"))
 			{
-				StartFire(AI, SkillConfigEffectNode.ProjectileClassPath);
+				StartFire(AI, SoftClassPathMap["ProjectileClassPath"]);
 			}
 
 			// 记得设置一下释放技能时间
@@ -27,20 +25,6 @@ void ASkill_Attack::ExecuteSkill()
 			SkillComponent->SetLastReleaseSkillTime(SkillId, CurrentTime);
 		}
 	}
-}
-
-FSkill_Config_Effect_Node ASkill_Attack::GetSkillConfigEffectNode()
-{
-	if (SkillComponent)
-	{
-		ASkillManager* SkillManager = SkillComponent->GetSkillManager();
-		if (SkillManager)
-		{
-			FSkill_Config_Node SkillConfigNode = SkillManager->GetSkillConfigNode(SkillId);
-			return SkillConfigNode.TriggerEffect;
-		}
-	}
-	return FSkill_Config_Effect_Node();
 }
 
 void ASkill_Attack::StartFire(AAICharacter_Base* AI, FSoftClassPath ProjectileClass)

@@ -23,6 +23,12 @@ void AAIController_Base::OnPossess(APawn* InPawn)
 	{
 		GM->OnPlayGame.AddDynamic(this, &AAIController_Base::OnGamePlay);
 	}
+
+	AAICharacter_Base* AI_CloseCombat = Cast<AAICharacter_Base>(InPawn);
+	if (AI_CloseCombat)
+	{
+		AI_CloseCombat->Init();
+	}
 }
 
 void AAIController_Base::BeginPlay()
@@ -143,50 +149,31 @@ AAICharacter_Base* AAIController_Base::SelectTarget_First()
 
 AAICharacter_Base* AAIController_Base::SelectTarget_Nearest()
 {
-	//USTRUCT(BlueprintType)
-	//struct FTempStruct
-	//{
-	//	GENERATED_USTRUCT_BODY()
+	TArray<FTempStruct> TempArray;
+	for (int i = 0; i < M_EnemyArray.Num(); i++)
+	{
+		if (M_EnemyArray[i] != nullptr && M_EnemyArray[i]->IsDead() == false)
+		{
+			FTempStruct TempStructNode;
+			TempStructNode.TempEnemy = M_EnemyArray[i];
+			TempStructNode.dis = FVector::Distance(GetPawn()->GetActorLocation(), M_EnemyArray[i]->GetActorLocation());
+			TempArray.Add(TempStructNode);
+		}
+	}
+	TempArray.Sort();
 
-	//public:
-	//	UPROPERTY()
-	//	AAICharacter_Base* TempEnemy;
+	AAICharacter_Base* TargetEnemy = nullptr;
+	if (TempArray.Num())
+	{
+		TargetEnemy = TempArray[0].TempEnemy;
 
-	//	UPROPERTY()
-	//	float dis;		// 两者之间的距离
+		// 从原数组中删除
+		M_EnemyArray.Remove(TargetEnemy);
+	}
 
-	//	bool operator<(const FTempStruct& TempStructNode) const
-	//	{
-	//		//>是从大到小排序，<就是从小到大
-	//		return dis < TempStructNode.dis;
-	//	}
-	//};
+	return TargetEnemy;
 
-	//TArray<FTempStruct> TempArray;
-	//for (int i = 0; i < EnemyArray.Num(); i++)
-	//{
-	//	if (EnemyArray[i] != nullptr && EnemyArray[i]->IsDead() == false)
-	//	{
-	//		FTempStruct TempStructNode;
-	//		TempStructNode.TempEnemy = EnemyArray[i];
-	//		TempStructNode.dis = FVector::Distance(this->GetActorLocation(), EnemyArray[i]->GetActorLocation());
-	//		TempArray.Add(TempStructNode);
-	//	}
-	//}
-	//TempArray.Sort();
-
-	//AAICharacter_Base* TargetEnemy = nullptr;
-	//if (TempArray.Num())
-	//{
-	//	TargetEnemy = TempArray[0].TempEnemy;
-
-	//	// 从原数组中删除
-	//	EnemyArray.Remove(TargetEnemy);
-	//}
-
-	//return TargetEnemy;
-
-	return nullptr;
+	//return nullptr;
 }
 
 // 处理 AI 死亡

@@ -28,8 +28,6 @@ void ASkill_Base::Tick(float DeltaTime)
 
 void ASkill_Base::Init(USkillComponent* NewSkillComponent, FString NewSkillId)
 {
-	SkillComponent = NewSkillComponent;
 	SkillId = NewSkillId;
 }
-
 

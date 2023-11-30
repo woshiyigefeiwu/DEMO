@@ -97,8 +97,4 @@ public:
 // ---------------------------------- Skill Config --------------------
 	UPROPERTY(EditAnywhere, Category = SkillConfig)
 	USkillConfig* SkillConfig = nullptr;
-
-	// ÑªÌõ UI ¿Ø¼þ
-	//UPROPERTY(EditAnywhere, Category=UIConfig)
-	//FSoftClassPath HpBar_Path;
 };

@@ -74,6 +74,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetMaxHp() { return MaxHP; }
 
+	// 获取最大生命值
+	UFUNCTION(BlueprintCallable)
+	float SetMaxHp(float NewMaxHp) { MaxHP = NewMaxHp; return MaxHP; }
+
 	// 获取当前生命值
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentHp() { return M_CurrentHP; }
@@ -254,18 +258,6 @@ public:
 	// 整个释放技能流程
 	UFUNCTION(BlueprintCallable)
 	bool RunExecuteSkill(FString SkillId);
-
-	// 判断是否能释放技能
-	//UFUNCTION(BlueprintCallable)
-	//bool CanExecuteSkill(FString SkillId);
-
-	// 扣除技能消耗
-	//UFUNCTION(BlueprintCallable)
-	//void ReduceSkillConsume(FString SkillId);
-	
-	// 执行技能
-	//UFUNCTION(BlueprintCallable)
-	//void ExecuteSkill(FString SkillId);
 
 	// 获取当前总的 Hp
 	UFUNCTION(BlueprintCallable)

@@ -37,10 +37,6 @@ public:
 	UFUNCTION()
 	void Init(AAICharacter_Base* OwnerCharacter);
 
-	// 撞击之后的回调函数
-	//UFUNCTION()
-	//void OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
 	// 播放特效
 	void PlayEffect();
 

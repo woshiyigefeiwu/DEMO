@@ -10,7 +10,7 @@
 
 // 技能类型（同时代表技能的执行逻辑）
 UENUM(BlueprintType)
-enum class ESkillType : uint8
+enum class ESkillEffectType : uint8
 {
 	NONE,
 	Attack					= 1		UMETA(DisplayName = "Attack"),
@@ -41,6 +41,7 @@ enum class EActionObject : uint8
 {
 	NONE,
 	SELF = 1		UMETA(DisplayName = "Self"),
+	Friend = 2		UMETA(DisplayName = "Friend"),
 };
 
 // 属性类型
@@ -97,15 +98,50 @@ struct FSkill_Config_Consume_Node
 	ETriggerConsume TriggerConsumeType;
 };
 
+// 触发效果 ------------------ 属性附加值
+//USTRUCT(BlueprintType)
+//struct FSkill_Config_Effect_AdditionalAttribute_Node
+//{
+//	GENERATED_BODY()
+//
+//	UPROPERTY(EditAnywhere, Category = "SkillEffect|AdditionalAttribute")
+//	TMap<EAttributeType, float> AdditionalAttributeList;
+//};
+
+// 触发效果 ------------------ 攻击
+//USTRUCT(BlueprintType)
+//struct FSkill_Config_Effect_Attack_Node
+//{
+//	GENERATED_BODY()
+//
+//	// 是否有发射物
+//	UPROPERTY(EditAnywhere, Category = "SkillEffect|Attack")
+//	bool IsHasProjectile;			
+//
+//	// 发射物的BP
+//	UPROPERTY(EditAnywhere, Category = "SkillEffect|Attack", meta = (EditCondition = "IsHasProjectile", EditConditionHides))
+//	FSoftClassPath ProjectileClassPath;
+//};
+
 // 触发效果
 USTRUCT(BlueprintType)
 struct FSkill_Config_Effect_Node
 {
 	GENERATED_BODY()
 
+	// 触发效果类型
+	//UPROPERTY(EditAnywhere, Category = "SkillEffect")
+	//ESkillEffectType SkillEffectType;
+
 	// 触发效果执行体
 	UPROPERTY(EditAnywhere, Category = "SkillEffect")
 	FSoftClassPath SkillEffectExecutor;
+
+	//UPROPERTY(EditAnywhere, Category = "SkillEffect|AdditionalAttribute", meta = (EditCondition = "SkillEffectType == ESkillEffectType::ChangeAttributeValue", EditConditionHides))
+	//FSkill_Config_Effect_AdditionalAttribute_Node Skill_Config_Effect_AdditionalAttribute_Node;
+
+	//UPROPERTY(EditAnywhere, Category = "SkillEffect|Attack", meta = (EditCondition = "SkillEffectType == ESkillEffectType::Attack", EditConditionHides))
+	//FSkill_Config_Effect_Attack_Node Skill_Config_Effect_Attack_Node;
 
 	// 触发效果 ------------------ 属性附加值
 	UPROPERTY(EditAnywhere, Category = "SkillEffect|AdditionalAttribute")
@@ -115,7 +151,7 @@ struct FSkill_Config_Effect_Node
 
 	// 是否有发射物
 	UPROPERTY(EditAnywhere, Category = "SkillEffect|Attack")
-	bool IsHasProjectile;			
+	bool IsHasProjectile;
 
 	// 发射物的BP
 	UPROPERTY(EditAnywhere, Category = "SkillEffect|Attack", meta = (EditCondition = "IsHasProjectile", EditConditionHides))

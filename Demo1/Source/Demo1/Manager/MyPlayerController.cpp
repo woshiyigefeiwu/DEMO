@@ -57,9 +57,4 @@ AAICharacter_Base* AMyPlayerController::GetAIDefaultObject(FSoftClassPath AISoft
 	return AI_Base;
 }
 
-//void AMyPlayerController::HideMouse()
-//{
-//	bShowMouseCursor = false;
-//}
-
 

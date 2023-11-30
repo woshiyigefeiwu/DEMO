@@ -22,6 +22,9 @@ function WBP_GamePlay:Bind()
     self.RestartButton.OnClicked:Add(self, self.OnClickedRestartButton);
     self.ExitButton.OnClicked:Add(self, self.OnClickedExitButton);
     self.GameDataButton.OnClicked:Add(self,self.OnClickedGameDataButton);
+
+    local GS = UE.UGameplayStatics.GetGameState(self);
+    GS.GameOverDelegate:Add(self,self.OnGameOver);
 end
 
 function WBP_GamePlay:Init()
@@ -43,6 +46,16 @@ function WBP_GamePlay:Init()
 end
 
 ------------------------- Event -------------------------
+
+-- 游戏结束
+function WBP_GamePlay:OnGameOver()
+    -- self:QuitGame();
+    local GS = UE.UGameplayStatics.GetGameState(self);
+    local UIM = GS:GetUIManager();
+    if(UIM) then
+        UIM:ShowUI("UI_GameOver");
+    end    
+end
 
 -- 退出按钮
 function WBP_GamePlay:OnClickedExitButton()
