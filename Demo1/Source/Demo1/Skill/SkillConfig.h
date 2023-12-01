@@ -123,6 +123,25 @@ struct FSkill_Config_Consume_Node
 //	FSoftClassPath ProjectileClassPath;
 //};
 
+// 触发效果 ------------------ 自爆
+USTRUCT(BlueprintType)
+struct FSkill_Config_Effect_SelfExplosion_Node
+{
+	GENERATED_BODY()
+
+	// 爆炸物
+	UPROPERTY(EditAnywhere)
+	FSoftClassPath ExplosionObjectClassPath;
+
+	// 多少秒后自爆
+	UPROPERTY(EditAnywhere)
+	float ExplosionTime;
+	
+	// 爆炸范围
+	UPROPERTY(EditAnywhere)
+	FVector ExplosionRange;
+};
+
 // 触发效果
 USTRUCT(BlueprintType)
 struct FSkill_Config_Effect_Node
@@ -148,14 +167,15 @@ struct FSkill_Config_Effect_Node
 	TMap<EAttributeType, float> AdditionalAttributeList;
 
 	// 触发效果 ------------------ 攻击
-
-	// 是否有发射物
 	UPROPERTY(EditAnywhere, Category = "SkillEffect|Attack")
-	bool IsHasProjectile;
+	bool IsHasProjectile;					// 是否有发射物
 
-	// 发射物的BP
 	UPROPERTY(EditAnywhere, Category = "SkillEffect|Attack", meta = (EditCondition = "IsHasProjectile", EditConditionHides))
-	FSoftClassPath ProjectileClassPath;
+	FSoftClassPath ProjectileClassPath;		// 发射物的 BP
+
+	// 触发效果 ------------------- 自爆
+	UPROPERTY(EditAnywhere, Category = "SkillEffect|SelfExplosion")
+	FSkill_Config_Effect_SelfExplosion_Node Skill_Config_Effect_SelfExplosion_Node;
 };
 
 // 其他配置

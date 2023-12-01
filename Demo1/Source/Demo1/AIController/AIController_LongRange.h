@@ -28,8 +28,17 @@ public:
 	UFUNCTION()
 	void Tick(float DeltaSeconds) override;
 
+	// 更新一下状态（进入追击范围，进入攻击范围）
+	//UFUNCTION()
+	//void UpdateState();
+
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+
+	void FindTarget() override;
+
+	// 初始化感知组件
+	void InitAIPerception(APawn* InPawn) override;
 
 private:
 	UPROPERTY()

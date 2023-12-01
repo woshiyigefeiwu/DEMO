@@ -88,6 +88,7 @@ void AAIController_Base::RunAIBehaviorTree(APawn* InPawn)
 void AAIController_Base::UpdateBBV_IsInAttackRange()
 {
 	M_Blackboard->SetValueAsBool("IsInAttackRange", M_IsInAttackRange);
+	
 }
 
 void AAIController_Base::UpdateBBV_Target()
